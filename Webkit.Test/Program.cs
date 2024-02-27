@@ -1,43 +1,40 @@
 
 using System.ComponentModel.DataAnnotations;
 using System.Net.Mail;
+using Webkit.Attributes;
 using Webkit.Mocking.EntityFramework;
 using Webkit.Models.EntityFramework;
 using Webkit.Security;
+using Webkit.Security.Password;
+using Webkit.Sessions;
 
 namespace Webkit.Test
 {
     public class Program
     {
-        class User : UserModel
-        {
-            public string Username { get; set; } = "";
-
-            public string Email { get; set; } = "";
-        }
-
-        class Database : MockDbContext
-        {
-            public MockDbSet<User> Users { get; set; } = new MockDbSet<User>
-            {
-                new User
-                    {
-                        Username = "Test1",
-                        Email = "Yoer@google.com",
-                        Roles = new List<string>
-                        {
-                            "Administrator"
-                        }
-                    }
-            };
-        }
-
         public static void Main(string[] args)
         {
-            using(Database db = new Database())
+            //using(Database db = new Database())
+            //{
+            //    List<User> users = db.Users.Where(user => user.Id == Database.Test1UserId).ToList();
+            //    if(!users.Any())
+            //    {
+            //        Console.WriteLine("No users found");
+            //        return;
+            //    }
+
+            //    User user = users.First();
+            //}
+
+            AuthenticateAttribute.ValidateToken = bool (string token) =>
             {
-                Console.WriteLine(new SecureToken().ToString());
-            }
+                using (MockDatabase db = new MockDatabase())
+                {
+                    return db.Users.Any(user => user.Token == token);
+                }
+            };
+
+            Console.WriteLine("Thingy: " + PasswordHandler.Secure("123abc"));
             
             var builder = WebApplication.CreateBuilder(args);
 
