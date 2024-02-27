@@ -14,5 +14,7 @@ namespace Webkit.Security.Password
             string salt = CryptographicGenerator.UnicodeSeed(100);
             return Convert.ToBase64String(Encoding.UTF8.GetBytes(String.Join("", SHA256.HashData(Encoding.UTF8.GetBytes(password + salt)).Select(b => b.ToString("X2"))) + ":" + salt));
         }
+
+        // TODO: Add password checker
     }
 }
