@@ -34,7 +34,10 @@ namespace Webkit.Test
                 }
             };
 
-            Console.WriteLine("Thingy: " + PasswordHandler.Secure("123abc"));
+            string passwordHash = PasswordHandler.Hash("123abc");
+            Console.WriteLine("Thingy: " + passwordHash);
+
+            Console.WriteLine("Matches? " + PasswordHandler.Validate("123abc", passwordHash));
             
             var builder = WebApplication.CreateBuilder(args);
 
