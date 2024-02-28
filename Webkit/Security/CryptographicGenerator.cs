@@ -7,6 +7,9 @@ using System.Threading.Tasks;
 
 namespace Webkit.Security
 {
+    /// <summary>
+    /// A generator to create cryptographically strong data
+    /// </summary>
     public class CryptographicGenerator
     {
         /// <summary>
@@ -33,7 +36,7 @@ namespace Webkit.Security
                 stringBuilder.Append((char)RandomNumberGenerator.GetInt32(0x1000, 0x34ff));
             }
 
-            return stringBuilder.ToString() + "-" + DateTimeOffset.UtcNow.ToUnixTimeSeconds().ToString("X8");
+            return stringBuilder.ToString() + "-" + DateTime.Now.Ticks.ToString("X8");
         }
     }
 }
