@@ -1,5 +1,6 @@
 ﻿using Webkit.Mocking.EntityFramework;
 using Webkit.Models.EntityFramework;
+using Webkit.Security.Password;
 
 namespace Webkit.Test
 {
@@ -63,6 +64,7 @@ namespace Webkit.Test
                     {
                         Id = Test1UserId,
                         Username = "Test1",
+                        Password = PasswordHandler.Hash("abc"),
                         Email = "Yoer@google.com",
                         Roles = new List<string>
                         {
@@ -77,6 +79,7 @@ namespace Webkit.Test
                     {
                         Id = RashUserId,
                         Username = "Rash",
+                        Password = PasswordHandler.Hash("123"),
                         Email = "Balter@google.com",
                         Roles = new List<string>
                         {

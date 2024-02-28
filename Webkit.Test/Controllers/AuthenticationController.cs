@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Webkit.Security;
+using Webkit.Security.Password;
 using Webkit.Sessions;
 
 namespace Webkit.Test.Controllers
@@ -8,13 +10,27 @@ namespace Webkit.Test.Controllers
     [ApiController]
     public class AuthenticationController : ControllerBase
     {
-        [HttpGet("login")]
-        public LoginResponse Login([FromBody] LoginDto loginDto)
+        [HttpPost("login")]
+        public ActionResult<LoginResponse> Login([FromBody] LoginDto loginDto)
         {
-            return new LoginResponse
+            using(MockDatabase mockDb = new MockDatabase())
             {
-                SessionId = ""
-            };
+                List<User> users = mockDb.Users.Where(user => user.Username == loginDto.Username && PasswordHandler.Validate(loginDto.Password, user.Password)).ToList();
+                if(!users.Any())
+                {
+                    return NotFound();
+                }
+
+                User user = users.First();
+                user.Token = CryptographicGenerator.Seed();
+
+                mockDb.SaveChanges();
+
+                return new LoginResponse
+                {
+                    SessionId = user.Token
+                };
+            }
         }
 
         public class LoginDto

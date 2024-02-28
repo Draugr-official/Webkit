@@ -23,39 +23,24 @@ namespace Webkit.Security.Password
         /// <summary>
         /// Checks if the password matches the hash
         /// </summary>
-        /// <param name="hashedPassword"></param>
+        /// <param name="hash"></param>
         /// <returns></returns>
-        public static bool Validate(string password, string hashedPassword)
+        public static bool Validate(string password, string hash)
         {
-            // Validate input parameters
-            if (string.IsNullOrEmpty(password))
+            try
             {
-                throw new ArgumentNullException(nameof(password), "Password cannot be null or empty.");
+                hash = Encoding.Unicode.GetString(Convert.FromBase64String(hash));
+
+                var parts = hash.Split(':');
+                if (parts.Length != 2)
+                {
+                    throw new ArgumentException("Invalid format for hashed password.", nameof(hash));
+                }
+
+                var expectedHash = string.Join("", SHA256.HashData(Encoding.Unicode.GetBytes(password + parts[1])).Select(b => b.ToString("X2")));
+                return expectedHash == parts[0];
             }
-
-            if (string.IsNullOrEmpty(hashedPassword))
-            {
-                throw new ArgumentNullException(nameof(hashedPassword), "Hashed password cannot be null or empty.");
-            }
-
-            // Split the hashed password and salt
-            var parts = hashedPassword.Split(':');
-            if (parts.Length != 2)
-            {
-                throw new ArgumentException("Invalid format for hashed password.", nameof(hashedPassword));
-            }
-
-            var salt = Convert.FromBase64String(parts[1]);
-
-            // Generate the expected hash with the provided password and salt
-            var expectedHash = Convert.ToBase64String(Encoding.Unicode.GetBytes(
-                string.Join("", SHA256.HashData(Encoding.Unicode.GetBytes(password + salt)))
-                + ":" + Convert.ToBase64String(salt)));
-
-            // Compare the generated hash with the provided hashed password
-            return expectedHash == hashedPassword;
+            catch { return false; }
         }
-
-        // TODO: Add password checker
     }
 }

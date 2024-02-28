@@ -8,6 +8,11 @@ namespace Webkit.Mocking.EntityFramework
 {
     public class MockDbContext : IDisposable
     {
+        public void SaveChanges()
+        {
+
+        }
+
         public void Dispose()
         {
             // ...

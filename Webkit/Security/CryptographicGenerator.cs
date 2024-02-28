@@ -10,13 +10,13 @@ namespace Webkit.Security
     public class CryptographicGenerator
     {
         /// <summary>
-        /// Generates a cryptographically safe seed
+        /// Generates a cryptographically safe seed. The total length is 9 bytes longer than specified length.
         /// </summary>
         /// <param name="length"></param>
         /// <returns></returns>
         public static string Seed(int length = 40)
         {
-            return RandomNumberGenerator.GetString("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890", 40);
+            return RandomNumberGenerator.GetString("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890", length) + "-" + DateTime.Now.Ticks.ToString("X8");
         }
 
         /// <summary>
@@ -33,7 +33,7 @@ namespace Webkit.Security
                 stringBuilder.Append((char)RandomNumberGenerator.GetInt32(0x1000, 0x34ff));
             }
 
-            return stringBuilder.ToString();
+            return stringBuilder.ToString() + "-" + DateTimeOffset.UtcNow.ToUnixTimeSeconds().ToString("X8");
         }
     }
 }
