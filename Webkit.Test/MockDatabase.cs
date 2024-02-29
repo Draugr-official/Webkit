@@ -5,7 +5,7 @@ using Webkit.Security.Password;
 namespace Webkit.Test
 {
 
-    class User : UserModel
+    public class User : UserModel
     {
         public Guid Id { get; set; }
 
@@ -18,7 +18,7 @@ namespace Webkit.Test
         public List<Guid> Channels { get; set; } = new List<Guid>();
     }
 
-    class Channel
+    public class Channel
     {
         public Guid Id { get; set; }
 
@@ -29,13 +29,13 @@ namespace Webkit.Test
         public ChannelType Type { get; set; }
     }
 
-    enum ChannelType
+    public enum ChannelType
     {
         DirectMessage,
         Group
     }
 
-    class Message
+    public class Message
     {
         public Guid Id { get; set; }
 
@@ -44,14 +44,14 @@ namespace Webkit.Test
         public Guid ChannelId { get; set; }
     }
 
-    class ChannelBinding
+    public class ChannelBinding
     {
         public Guid UserId { get; set; }
 
         public Guid ChannelId { get; set; }
     }
 
-    class MockDatabase : MockDbContext
+    public class MockDatabase : MockDbContext
     {
         public static Guid ChannelId = Guid.NewGuid();
 

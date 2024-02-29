@@ -7,6 +7,7 @@ using Webkit.Models.EntityFramework;
 using Webkit.Security;
 using Webkit.Security.Password;
 using Webkit.Sessions;
+using Webkit.Extensions;
 
 namespace Webkit.Test
 {
@@ -14,18 +15,6 @@ namespace Webkit.Test
     {
         public static void Main(string[] args)
         {
-            //using(Database db = new Database())
-            //{
-            //    List<User> users = db.Users.Where(user => user.Id == Database.Test1UserId).ToList();
-            //    if(!users.Any())
-            //    {
-            //        Console.WriteLine("No users found");
-            //        return;
-            //    }
-
-            //    User user = users.First();
-            //}
-
             AuthenticateAttribute.ValidateToken = bool (string token) =>
             {
                 using (MockDatabase db = new MockDatabase())
@@ -34,9 +23,12 @@ namespace Webkit.Test
                 }
             };
 
-            Console.WriteLine(CryptographicGenerator.Seed());
+            using(MockDatabase db = new MockDatabase())
+            {
+                db.Users.Where(user => user.Username == "Test1").LogAsJson("Buddahs: ");
+            }
 
-            var builder = WebApplication.CreateBuilder(args);
+            WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
             // Add services to the container.
 

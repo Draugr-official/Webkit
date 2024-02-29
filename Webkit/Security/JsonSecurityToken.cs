@@ -15,22 +15,35 @@ namespace Webkit.Security
     [Serializable]
     public class JsonSecurityToken
     {
+        /// <summary>
+        /// The guid of the user
+        /// </summary>
         [JsonPropertyName("userId")]
-        public string UserId { get; set; }
+        public Guid UserId { get; set; }
 
+        /// <summary>
+        /// The roles assigned to the user
+        /// </summary>
         [JsonPropertyName("roles")]
         public List<string> Roles { get; set; }
 
+        /// <summary>
+        /// The date of when the token expires
+        /// </summary>
         [JsonPropertyName("expiration")]
         public DateTime Expiration { get; set; }
 
+        /// <summary>
+        /// The universally unique signature of the token
+        /// </summary>
         [JsonPropertyName("signature")]
         public string Signature { get; set; }
+
         
         /// <summary>
         /// <inheritdoc cref="SecureToken"/>
         /// </summary>
-        public JsonSecurityToken(string userId, List<string> roles, DateTime expiration)
+        public JsonSecurityToken(Guid userId, List<string> roles, DateTime expiration)
         {
             UserId = userId;
             Signature = CryptographicGenerator.Seed();

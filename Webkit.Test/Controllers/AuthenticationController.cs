@@ -22,13 +22,15 @@ namespace Webkit.Test.Controllers
                 }
 
                 User user = users.First();
-                user.Token = CryptographicGenerator.Seed();
+
+                string sessionId = UserSessionCache.Register(new JsonSecurityToken(user.Id, user.Roles, DateTime.Now.AddDays(30)));
+                user.Token = sessionId;
 
                 mockDb.SaveChanges();
 
                 return new LoginResponse
                 {
-                    SessionId = user.Token
+                    SessionId = sessionId
                 };
             }
         }
