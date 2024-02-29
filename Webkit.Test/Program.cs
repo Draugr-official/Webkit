@@ -25,7 +25,7 @@ namespace Webkit.Test
 
             using(MockDatabase db = new MockDatabase())
             {
-                db.Users.Where(user => user.Username == "Test1").LogAsJson("Buddahs: ");
+                db.Users.Where(user => user.Username == "Test1").LogAsXml("Buddahs: ");
             }
 
             WebApplicationBuilder builder = WebApplication.CreateBuilder(args);

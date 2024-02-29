@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Runtime.Caching;
 using System.Text;
@@ -27,52 +28,27 @@ namespace Webkit.Extensions
         };
 
         /// <summary>
-        /// XmlSerializer uses assembly generation, and assemblies cannot be collected. It does some automatic cache/reuse for the simplest constructor scenarios (new XmlSerializer(Type), etc), but not for all scenarios, hence a custom cache implementation.
-        /// </summary>
-        static MemoryCache XmlSerializerCache = new MemoryCache("XmlSerializerCache");
-
-        /// <summary>
         /// Writes the value to the default output. If T is not a primitive type, value will be serialized as json.
         /// </summary>
         public static void LogAsXml<T>(this T value)
         {
-            string? qualifiedName = typeof(T).AssemblyQualifiedName;
-            if(qualifiedName == null)
-            {
-                qualifiedName = typeof(T).FullName;
-            }
+            LogAsXml(value, "", "");
+        }
 
-            if(typeof(T).IsNotPublic)
-            {
-                Log(qualifiedName, "Cannot serialize a non-public object to XML");
-                return;
-            }
+        /// <summary>
+        /// <inheritdoc cref="Log{T}(T)"/>
+        /// </summary>
+        public static void LogAsXml<T>(this T value, string prependText)
+        {
+            LogAsXml(value, prependText, "");
+        }
 
-            XmlSerializer serializer;
-
-            if (XmlSerializerCache.Contains(qualifiedName))
-            {
-                serializer = (XmlSerializer)XmlSerializerCache.Get(qualifiedName);
-
-                // If the serializer has been accessed within the past 5 minutes, refresh the expiration.
-                XmlSerializerCache.Set(qualifiedName, serializer, DateTime.Now.AddMinutes(5));
-
-                Log("");
-            }
-            else
-            {
-                serializer = new XmlSerializer(typeof(T));
-                XmlSerializerCache.Add(qualifiedName, serializer, DateTime.Now.AddMinutes(5));
-            }
-
-            using (StringWriter stringWriter = new StringWriter())
-            {
-                using (XmlWriter xmlWriter = XmlWriter.Create(stringWriter))
-                {
-                    serializer.Serialize(xmlWriter, value);
-                    Log(stringWriter.ToString());
-                }
-            }
+        /// <summary>
+        /// <inheritdoc cref="Log{T}(T)"/>
+        /// </summary>
+        public static void LogAsXml<T>(this T value, string prependText, string appendText)
+        {
+            Log(value.AsXml(), prependText, appendText);
         }
 
         /// <summary>
@@ -98,13 +74,7 @@ namespace Webkit.Extensions
         /// </summary>
         public static void LogAsJson<T>(this T value, string prependText, string appendText)
         {
-            if(typeof(T).IsSealed)
-            {
-                Log("Grrr illegale!");
-                return;
-            }
-
-            Log(prependText + JsonSerializer.Serialize(value, SerializerOptions) + appendText);
+            Log(prependText + value.AsJson() + appendText);
         }
 
         /// <summary>

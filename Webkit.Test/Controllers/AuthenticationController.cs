@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Webkit.Attributes;
 using Webkit.Security;
 using Webkit.Security.Password;
 using Webkit.Sessions;
@@ -10,6 +11,7 @@ namespace Webkit.Test.Controllers
     [ApiController]
     public class AuthenticationController : ControllerBase
     {
+        [Telemetry]
         [HttpPost("login")]
         public ActionResult<LoginResponse> Login([FromBody] LoginDto loginDto)
         {

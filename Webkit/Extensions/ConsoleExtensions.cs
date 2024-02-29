@@ -31,7 +31,7 @@ namespace Webkit.Extensions
             ConsoleColor previousColor = Console.ForegroundColor;
 
             Console.ForegroundColor = consoleColor;
-            Console.WriteLine(value);
+            Console.Write(value);
             Console.ForegroundColor = previousColor;
         }
     }
