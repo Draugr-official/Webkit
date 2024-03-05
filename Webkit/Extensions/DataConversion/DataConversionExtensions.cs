@@ -9,7 +9,7 @@ using System.Xml.Serialization;
 using System.Xml;
 using System.Runtime.Caching;
 
-namespace Webkit.Extensions
+namespace Webkit.Extensions.DataConversion
 {
     public static class DataConversionExtensions
     {

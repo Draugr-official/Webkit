@@ -9,23 +9,16 @@ using System.Text.Json.Serialization.Metadata;
 using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Serialization;
+using Webkit.Extensions.DataConversion;
 
-namespace Webkit.Extensions
+namespace Webkit.Extensions.Logging
 {
     public static class LoggingExtensions
     {
         /// <summary>
         /// The logging method used in for Log extensions. Console.WriteLine is used by default.
         /// </summary>
-        public static Action<object> DefaultLog { get; set; } = Console.WriteLine;
-
-        /// <summary>
-        /// The options used when serializing data
-        /// </summary>
-        public static JsonSerializerOptions SerializerOptions = new JsonSerializerOptions
-        {
-            WriteIndented = true,
-        };
+        public static Action<object> DefaultLog { get; set; } = System.Console.WriteLine;
 
         /// <summary>
         /// Writes the value to the default output. If T is not a primitive type, value will be serialized as json.

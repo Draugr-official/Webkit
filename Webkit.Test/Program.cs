@@ -8,6 +8,8 @@ using Webkit.Security;
 using Webkit.Security.Password;
 using Webkit.Sessions;
 using Webkit.Extensions;
+using Webkit.Extensions.Logging;
+using System.Text;
 
 namespace Webkit.Test
 {
@@ -22,11 +24,8 @@ namespace Webkit.Test
                     return db.Users.Any(user => user.Token == token);
                 }
             };
-
-            using(MockDatabase db = new MockDatabase())
-            {
-                db.Users.Where(user => user.Username == "Test1").LogAsXml("Buddahs: ");
-            }
+            Console.OutputEncoding = Encoding.Unicode;
+            CryptographicGenerator.UnicodeSeed(40).Log();
 
             WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 

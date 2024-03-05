@@ -7,7 +7,7 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using static System.Net.Mime.MediaTypeNames;
 
-namespace Webkit.Extensions
+namespace Webkit.Extensions.Console
 {
     public static class ConsoleExtensions
     {
@@ -28,11 +28,11 @@ namespace Webkit.Extensions
         /// <param name="value"></param>
         public static void Write(this ConsoleColor consoleColor, object value)
         {
-            ConsoleColor previousColor = Console.ForegroundColor;
+            ConsoleColor previousColor = System.Console.ForegroundColor;
 
-            Console.ForegroundColor = consoleColor;
-            Console.Write(value);
-            Console.ForegroundColor = previousColor;
+            System.Console.ForegroundColor = consoleColor;
+            System.Console.Write(value);
+            System.Console.ForegroundColor = previousColor;
         }
     }
 }
