@@ -6,6 +6,7 @@ using Webkit.Extensions.DataConversion;
 
 namespace Webkit.Attributes
 {
+    [AttributeUsage(AttributeTargets.Method | AttributeTargets.Class, AllowMultiple = false)]
     public class TelemetryAttribute : ActionFilterAttribute
     {
         /// <summary>

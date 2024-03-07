@@ -4,6 +4,7 @@ using System.Linq;
 using System.Runtime.Caching;
 using System.Text;
 using System.Threading.Tasks;
+using Webkit.Extensions.Logging;
 using Webkit.Security;
 
 namespace Webkit.Sessions
@@ -17,34 +18,38 @@ namespace Webkit.Sessions
         /// </summary>
         /// <param name="token"></param>
         /// <returns>The session id of the token</returns>
-        public static string Register(JsonSecurityToken token)
+        public static string Register(JsonSecurityToken token, DateTime expiration)
         {
-            string sessionId = token.AsString();
-            Cache.Add(sessionId, token, token.Expiration);
+            string stringToken = token.AsBase64String();
 
-            return sessionId;
+            if(!IsValid(stringToken))
+            {
+                Cache.Add(stringToken, token, expiration);
+            }
+
+            return stringToken;
         }
 
         /// <summary>
         /// Returns the token of a session
         /// </summary>
-        /// <param name="sessionId"></param>
+        /// <param name="token"></param>
         /// <returns></returns>
-        public static JsonSecurityToken Read(string sessionId)
+        public static JsonSecurityToken Read(string token)
         {
-            return (JsonSecurityToken)Cache.Get(sessionId);
+            return (JsonSecurityToken)Cache.Get(token);
         }
 
         /// <summary>
         /// Returns a token if session is valid
         /// </summary>
-        /// <param name="sessionId"></param>
+        /// <param name="token"></param>
         /// <returns></returns>
-        public static JsonSecurityToken? ReadIfValid(string sessionId)
+        public static JsonSecurityToken? ReadIfValid(string token)
         {
-            if(IsValid(sessionId))
+            if(IsValid(token))
             {
-                return Read(sessionId);
+                return Read(token);
             }
 
             return null;
@@ -53,11 +58,13 @@ namespace Webkit.Sessions
         /// <summary>
         /// Determines if a session is still valid
         /// </summary>
-        /// <param name="sessionId"></param>
+        /// <param name="token"></param>
         /// <returns></returns>
-        public static bool IsValid(string sessionId)
+        public static bool IsValid(string token)
         {
-            return Cache.Contains(sessionId);
+            String.Join("\n", Cache.Select(t => t.Key + ": " + t.Value)).Log();
+
+            return Cache.Contains(token);
         }
     }
 }

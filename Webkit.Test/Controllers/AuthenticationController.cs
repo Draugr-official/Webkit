@@ -7,13 +7,13 @@ using Webkit.Sessions;
 
 namespace Webkit.Test.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/authentication")]
     [ApiController]
     public class AuthenticationController : ControllerBase
     {
         [Telemetry]
         [HttpPost("login")]
-        public ActionResult<LoginResponse> Login([FromBody] LoginDto loginDto)
+        public ActionResult Login([FromBody] LoginDto loginDto)
         {
             using(MockDatabase mockDb = new MockDatabase())
             {
@@ -25,15 +25,19 @@ namespace Webkit.Test.Controllers
 
                 User user = users.First();
 
-                string sessionId = UserSessionCache.Register(new JsonSecurityToken(user.Id, user.Roles, DateTime.Now.AddDays(30)));
-                user.Token = sessionId;
+                JsonSecurityToken jsonToken = new JsonSecurityToken(user.Id, user.Roles);
+
+                DateTime tokenExpiration = DateTime.Now.AddDays(30);
+                string token = UserSessionCache.Register(jsonToken, tokenExpiration);
+                user.Token = token;
 
                 mockDb.SaveChanges();
 
-                return new LoginResponse
+                Response.Cookies.Append("token", token, new CookieOptions
                 {
-                    SessionId = sessionId
-                };
+                    Expires = tokenExpiration,
+                });
+                return Ok();
             }
         }
 
@@ -42,11 +46,6 @@ namespace Webkit.Test.Controllers
             public string Username { get; set; } = "";
 
             public string Password { get; set; } = "";
-        }
-
-        public class LoginResponse
-        {
-            public string SessionId { get; set; } = "";
         }
     }
 }

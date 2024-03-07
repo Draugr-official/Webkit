@@ -19,7 +19,7 @@ namespace Webkit.Security
         /// The guid of the user
         /// </summary>
         [JsonPropertyName("userId")]
-        public Guid UserId { get; set; }
+        public string UserId { get; set; }
 
         /// <summary>
         /// The roles assigned to the user
@@ -28,26 +28,18 @@ namespace Webkit.Security
         public List<string> Roles { get; set; }
 
         /// <summary>
-        /// The date of when the token expires
-        /// </summary>
-        [JsonPropertyName("expiration")]
-        public DateTime Expiration { get; set; }
-
-        /// <summary>
         /// The universally unique signature of the token
         /// </summary>
         [JsonPropertyName("signature")]
         public string Signature { get; set; }
 
-        
         /// <summary>
         /// <inheritdoc cref="SecureToken"/>
         /// </summary>
-        public JsonSecurityToken(Guid userId, List<string> roles, DateTime expiration)
+        public JsonSecurityToken(string userId, List<string> roles)
         {
             UserId = userId;
             Signature = CryptographicGenerator.Seed();
-            Expiration = expiration;
             Roles = roles;
         }
 
@@ -64,7 +56,7 @@ namespace Webkit.Security
         /// Converts the token to a string and returns it
         /// </summary>
         /// <returns></returns>
-        public string AsString()
+        public string AsBase64String()
         {
             return Convert.ToBase64String(Encoding.UTF8.GetBytes(JsonSerializer.Serialize(this)));
         }
@@ -81,7 +73,7 @@ namespace Webkit.Security
         
         public override string ToString()
         {
-            return AsString();
+            return AsJson();
         }
     }
 }

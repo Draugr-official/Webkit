@@ -9,62 +9,48 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
+using Webkit.Extensions.Logging;
 using Webkit.Security;
+using Webkit.Sessions;
 
 namespace Webkit.Attributes
 {
     /// <summary>
-    /// Reads the Authorization header and determines if the token is valid
+    /// Reads the Authorization header and determines if the JsonSecurityToken is valid.
     /// </summary>
     [AttributeUsage(AttributeTargets.Method | AttributeTargets.Class, AllowMultiple = false)]
     public class AuthenticateAttribute : ActionFilterAttribute
     {
+        /// <summary>
+        /// The default method for checking if a token is still valid. Can be assigned with own implementation.
+        /// </summary>
+        public static Func<string, bool> ValidateToken = UserSessionCache.IsValid;
+
         public override void OnActionExecuting(ActionExecutingContext context)
         {
-            if (ValidateToken == null)
+            if (context.HttpContext.Request.Cookies.TryGetValue("token", out string token))
             {
-                throw new NotImplementedException("You must set the AuthenticateAttribute.ValidateToken delegate to use the Authenticate attribute.");
-            }
-
-            if (context.HttpContext.Request.Headers.TryGetValue("Authorization", out StringValues Authorization))
-            {
-                string authorizationContent = Authorization.First();
-
-                Span<byte> base64Bytes = new Span<byte>();
-                if (Convert.TryFromBase64String(authorizationContent, base64Bytes, out int _))
+                string rawJsonSecurityToken = Encoding.UTF8.GetString(Convert.FromBase64String(token));
+                JsonSecurityToken? jsonSecurityToken = JsonSecurityToken.FromString(rawJsonSecurityToken);
+                if (jsonSecurityToken == null)
                 {
-                    string rawJsonSecurityToken = Encoding.UTF8.GetString(base64Bytes);
-                    JsonSecurityToken? jsonSecurityToken = JsonSecurityToken.FromString(rawJsonSecurityToken);
-                    if (jsonSecurityToken == null)
-                    {
-                        context.Result = new BadRequestResult();
-                        return;
-                    }
-
-                    // If token has expired
-                    if (jsonSecurityToken.Expiration < DateTime.Now)
-                    {
-                        context.Result = new UnauthorizedResult();
-                        return;
-                    }
-
-                    // If token is valid
-                    if (!ValidateToken(rawJsonSecurityToken))
-                    {
-                        context.Result = new UnauthorizedResult();
-                        return;
-                    }
+                    context.Result = new BadRequestResult();
+                    return;
                 }
-            }
-            else
-            {
-                context.Result = new BadRequestResult();
+
+                // If token is valid
+                if (!UserSessionCache.IsValid(token))
+                {
+                    context.Result = new UnauthorizedResult();
+                    return;
+                }
+
                 return;
             }
 
-            // success
+            Console.WriteLine("Fingle");
+            context.Result = new BadRequestResult();
+            return;
         }
-        
-        public static Func<string, bool>? ValidateToken { get; set; }
     }
 }

@@ -19,6 +19,8 @@ namespace Webkit.Test.Controllers
             _logger = logger;
         }
 
+        [Authenticate]
+        [Authorize(Role = "Administrator")]
         [HttpGet(Name = "GetWeatherForecast")]
         public IEnumerable<WeatherForecast> Get()
         {

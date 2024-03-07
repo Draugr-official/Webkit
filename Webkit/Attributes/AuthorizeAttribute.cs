@@ -9,7 +9,7 @@ using Webkit.Security;
 
 namespace Webkit.Attributes
 {
-    [AttributeUsage(AttributeTargets.Method | AttributeTargets.Class, AllowMultiple = false)]
+    [AttributeUsage(AttributeTargets.Method | AttributeTargets.Class, AllowMultiple = true)]
     public class AuthorizeAttribute : ActionFilterAttribute
     {
         [Required]
@@ -17,10 +17,10 @@ namespace Webkit.Attributes
 
         public override void OnActionExecuting(ActionExecutingContext context)
         {
-            if (context.HttpContext.Request.Headers.TryGetValue("Authorization", out var authorizationContent))
+            if (context.HttpContext.Request.Cookies.TryGetValue("token", out var token))
             {
-                JsonSecurityToken? jsonSecurityToken = JsonSecurityToken.FromString(authorizationContent);
-                if(jsonSecurityToken == null)
+                JsonSecurityToken? jsonSecurityToken = JsonSecurityToken.FromString(Encoding.UTF8.GetString(Convert.FromBase64String(token)));
+                if (jsonSecurityToken == null)
                 {
                     context.Result = new BadRequestResult();
                     return;
@@ -28,10 +28,12 @@ namespace Webkit.Attributes
 
                 if (!jsonSecurityToken.Roles.Contains(Role))
                 {
-                    context.Result = new UnauthorizedResult();
+                    context.Result = new StatusCodeResult(403);
                     return;
                 }
             }
+
+            base.OnActionExecuting(context);
         }
     }
 }

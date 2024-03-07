@@ -7,7 +7,7 @@ namespace Webkit.Test
 
     public class User : UserModel
     {
-        public Guid Id { get; set; }
+        public string Id { get; set; } = "";
 
         public string Username { get; set; } = "";
 
@@ -62,13 +62,14 @@ namespace Webkit.Test
             {
                 new User
                     {
-                        Id = Test1UserId,
+                        Id = "1",
                         Username = "Test1",
                         Password = PasswordHandler.Hash("abc"),
                         Email = "Yoer@google.com",
                         Roles = new List<string>
                         {
-                            "Administrator"
+                            "Administrator",
+                            "User"
                         },
                         Channels = new List<Guid>
                         {
@@ -77,7 +78,7 @@ namespace Webkit.Test
                     },
                 new User
                     {
-                        Id = RashUserId,
+                        Id = "2",
                         Username = "Rash",
                         Password = PasswordHandler.Hash("123"),
                         Email = "Balter@google.com",
