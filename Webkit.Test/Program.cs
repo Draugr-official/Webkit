@@ -10,6 +10,9 @@ using Webkit.Sessions;
 using Webkit.Extensions;
 using Webkit.Extensions.Logging;
 using System.Text;
+using System.Reflection;
+using Webkit.Email.SendGrid;
+using SendGrid.Helpers.Mail;
 
 namespace Webkit.Test
 {
