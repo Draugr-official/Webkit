@@ -12,7 +12,6 @@ namespace Webkit.Attributes
     [AttributeUsage(AttributeTargets.Method | AttributeTargets.Class, AllowMultiple = true)]
     public class AuthorizeAttribute : ActionFilterAttribute
     {
-        [Required]
         public string Role { get; set; } = "";
 
         public override void OnActionExecuting(ActionExecutingContext context)

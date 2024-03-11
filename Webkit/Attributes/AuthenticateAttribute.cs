@@ -48,7 +48,6 @@ namespace Webkit.Attributes
                 return;
             }
 
-            Console.WriteLine("Fingle");
             context.Result = new BadRequestResult();
             return;
         }
