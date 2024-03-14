@@ -1,8 +1,10 @@
-﻿using System;
+﻿using Newtonsoft.Json.Linq;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Runtime.Caching;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization.Metadata;
@@ -19,6 +21,8 @@ namespace Webkit.Extensions.Logging
         /// The logging method used in for Log extensions. Console.WriteLine is used by default.
         /// </summary>
         public static Action<object> DefaultLog { get; set; } = System.Console.WriteLine;
+
+
 
         /// <summary>
         /// Writes the value to the default output. If T is not a primitive type, value will be serialized as json.
@@ -43,6 +47,8 @@ namespace Webkit.Extensions.Logging
         {
             Log(value.AsXml(), prependText, appendText);
         }
+
+
 
         /// <summary>
         /// Writes the value to the default output. If T is not a primitive type, value will be serialized as json.
@@ -69,6 +75,8 @@ namespace Webkit.Extensions.Logging
         {
             Log(prependText + value.AsJson() + appendText);
         }
+
+
 
         /// <summary>
         /// Writes the value to the default output.
@@ -100,6 +108,58 @@ namespace Webkit.Extensions.Logging
         public static void Log<T>(this T value, string prependText, string appendText)
         {
             Log(prependText + value + appendText);
+        }
+
+
+
+        /// <summary>
+        /// Writes the array to the default output
+        /// </summary>
+        public static void Log(this Array array)
+        {
+            Log(String.Join("", array));
+        }
+
+        /// <summary>
+        /// <inheritdoc cref="Log(Array)"/>
+        /// </summary>
+        public static void Log(this Array array, string prependText)
+        {
+            Log(String.Join("", array), prependText);
+        }
+
+        /// <summary>
+        /// <inheritdoc cref="Log(Array)"/>
+        /// </summary>
+        public static void Log(this Array array, string prependText, string appendText)
+        {
+            Log(String.Join("", array), prependText, appendText);
+        }
+
+
+
+        /// <summary>
+        /// Writes the list to the default output.
+        /// </summary>
+        public static void Log<T>(this List<T> list)
+        {
+            Log(String.Join("", list));
+        }
+
+        /// <summary>
+        /// <inheritdoc cref="Log{T}(List{T})"/>
+        /// </summary>
+        public static void Log<T>(this List<T> list, string prependText)
+        {
+            Log(String.Join("", list), prependText);
+        }
+
+        /// <summary>
+        /// <inheritdoc cref="Log{T}(List{T})"/>
+        /// </summary>
+        public static void Log<T>(this List<T> list, string prependText, string appendText)
+        {
+            Log(String.Join("", list), prependText, appendText);
         }
     }
 }

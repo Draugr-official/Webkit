@@ -11,6 +11,11 @@ namespace Webkit.Sessions
 {
     public class UserSessionCache
     {
+        /// <summary>
+        /// Session duration in minutes
+        /// </summary>
+        public static int Duration = 60 * 2;
+
         static MemoryCache Cache = new MemoryCache("sessions");
 
         /// <summary>
@@ -38,6 +43,16 @@ namespace Webkit.Sessions
         public static JsonSecurityToken Read(string token)
         {
             return (JsonSecurityToken)Cache.Get(token);
+        }
+
+        /// <summary>
+        /// Refreshes the duration of a session
+        /// </summary>
+        /// <param name="token"></param>
+        public static void RefreshDuration(string token)
+        {
+            JsonSecurityToken jsonSecurityToken = (JsonSecurityToken)Cache.Get(token);
+            Cache.Set(token, jsonSecurityToken, DateTime.Now.AddMinutes(Duration));
         }
 
         /// <summary>

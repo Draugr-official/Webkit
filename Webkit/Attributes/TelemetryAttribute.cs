@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Filters;
+using System.Collections.Specialized;
+using System.Runtime.Caching;
 using Webkit.Extensions;
 using Webkit.Extensions.Console;
 using Webkit.Extensions.DataConversion;
@@ -7,80 +9,73 @@ using Webkit.Extensions.Logging;
 
 namespace Webkit.Attributes
 {
+    /// <summary>
+    /// An attribute to make diagnostic reports and see how endpoints are performing
+    /// <para>Access <see cref="TelemetryInsight.Diagnostics"/> to read endpoint diagnostic</para>
+    /// <para>Assign the <see cref="Log"/> action to set your own logger</para>
+    /// </summary>
     [AttributeUsage(AttributeTargets.Method | AttributeTargets.Class, AllowMultiple = false)]
     public class TelemetryAttribute : ActionFilterAttribute
     {
         /// <summary>
         /// The logging method used in for Log extensions. Console.WriteLine is used by default.
         /// </summary>
-        public static Action<TelemetryData> LogAction { get; set; } = (TelemetryData insights) =>
+        public static Action<TelemetryData> Log { get; set; } = (TelemetryData data) =>
         {
-            if (insights.IsSuccess)
-            {
-                ConsoleColor.White.WriteLine(insights.AsJson());
-                return;
-            }
-
-            ConsoleColor.Red.WriteLine(insights.AsJson());
-        };
-
-        public override void OnResultExecuted(ResultExecutedContext context)
-        {
-            string endpointKey = context.HttpContext.Request.Method + " " + context.HttpContext.Request.Path;
-
             TelemetryEndpointInsight endpointInsight;
-            if (TelemetryInsight.Endpoints.ContainsKey(endpointKey))
+            if (TelemetryInsight.Diagnostics.ContainsKey(data.Path))
             {
-                endpointInsight = TelemetryInsight.Endpoints[endpointKey];
+                endpointInsight = TelemetryInsight.Diagnostics[data.Path][data.HttpMethod];
             }
             else
             {
                 endpointInsight = new TelemetryEndpointInsight
                 {
-                    Method = context.HttpContext.Request.Method,
-                    Path = context.HttpContext.Request.Path,
-
-                    Success = 0,
-                    Failure = 0,
+                    Good = 0,
+                    Bad = 0,
                     Failures = new Dictionary<int, Dictionary<string, long>>()
                 };
 
-                TelemetryInsight.Endpoints.Add(endpointKey, endpointInsight);
+                TelemetryInsight.Diagnostics.Add(data.Path, new Dictionary<string, TelemetryEndpointInsight>
+                {
+                    { data.HttpMethod, endpointInsight }
+                });
             }
-            
-            if (context.HttpContext.Response.StatusCode < 400)
+
+            if (data.IsSuccess)
             {
-                endpointInsight.Success += 1;
+                endpointInsight.Good += 1;
             }
             else
             {
-                endpointInsight.Failure += 1;
+                endpointInsight.Bad += 1;
 
-                string failureKey = context.HttpContext.Response.Body.AsString();
-
-                if (endpointInsight.Failures.ContainsKey(context.HttpContext.Response.StatusCode))
+                if (endpointInsight.Failures.ContainsKey(data.HttpStatusCode))
                 {
-                    if(endpointInsight.Failures[context.HttpContext.Response.StatusCode].ContainsKey(failureKey))
+                    if (endpointInsight.Failures[data.HttpStatusCode].ContainsKey(data.Content))
                     {
-                        endpointInsight.Failures[context.HttpContext.Response.StatusCode][failureKey] += 1;
+                        endpointInsight.Failures[data.HttpStatusCode][data.Content] += 1;
                     }
                     else
                     {
-                        endpointInsight.Failures[context.HttpContext.Response.StatusCode].Add(failureKey, 1);
+                        endpointInsight.Failures[data.HttpStatusCode].Add(data.Content, 1);
                     }
                 }
                 else
                 {
-                    endpointInsight.Failures.Add(context.HttpContext.Response.StatusCode, new Dictionary<string, long>
+                    endpointInsight.Failures.Add(data.HttpStatusCode, new Dictionary<string, long>
                     {
-                        { failureKey, 1 }
+                        { data.Content, 1 }
                     });
                 }
             }
 
-            TelemetryInsight.Endpoints[endpointKey] = endpointInsight;
+            TelemetryInsight.Diagnostics[data.Path][data.HttpMethod] = endpointInsight;
+        };
 
-            LogAction(new TelemetryData
+        public override void OnResultExecuted(ResultExecutedContext context)
+        {
+            Log(new TelemetryData
             {
                 IsSuccess = context.HttpContext.Response.StatusCode < 400,
                 HttpStatusCode = context.HttpContext.Response.StatusCode,
@@ -98,30 +93,24 @@ namespace Webkit.Attributes
     /// </summary>
     public class TelemetryInsight
     {
-        public static Dictionary<string, TelemetryEndpointInsight> Endpoints = new Dictionary<string, TelemetryEndpointInsight>();
+        /// <summary>
+        /// The telemetry data of each endpoint (if there has been any data for given endpoint)
+        /// <para>Structure: TelemetryEndpointInsight TelemetryInsight.Diagnostics[path][method]</para>
+        /// </summary>
+        public static Dictionary<string, Dictionary<string, TelemetryEndpointInsight>> Diagnostics = new Dictionary<string, Dictionary<string, TelemetryEndpointInsight>>();
     }
 
     public struct TelemetryEndpointInsight
     {
         /// <summary>
-        /// The path of the endpoint
-        /// </summary>
-        public string Path { get; set; }
-
-        /// <summary>
-        /// The method used for the endpoint
-        /// </summary>
-        public string Method { get; set; }
-
-        /// <summary>
         /// Amount of successful requests
         /// </summary>
-        public long Success { get; set; }
+        public long Good { get; set; }
 
         /// <summary>
         /// Amount of failed requests
         /// </summary>
-        public long Failure { get; set; }
+        public long Bad { get; set; }
 
         /// <summary>
         /// A dictionary over failure messages and how many time they have failed

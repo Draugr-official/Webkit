@@ -24,7 +24,7 @@ namespace Webkit.Attributes
         /// <summary>
         /// The default method for checking if a token is still valid. Can be assigned with own implementation.
         /// </summary>
-        public static Func<string, bool> ValidateToken = UserSessionCache.IsValid;
+        public static Func<string, bool> Validate = UserSessionCache.IsValid;
 
         public override void OnActionExecuting(ActionExecutingContext context)
         {

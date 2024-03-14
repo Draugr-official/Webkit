@@ -4,9 +4,41 @@ Webkit is a SDK for ASP.NET applications. This SDK provides a wide range of usef
 ## Table of Content
 1. [Extensions](#webkit.extensions)
 	* [Logging](#webkit.extensions.logging)
+		* void \<T>.Log(T value)
+		* void \<T>.Log(T value, string prependText)
+		* void \<T>.Log(T value, string prependText, string appendText)
+		* void \<T>.LogAsJson(T value)
+		* void \<T>.LogAsJson(T value, string prependText)
+		* void \<T>.LogAsJson(T value, string prependText, string appendText)
+		* void \<T>.LogAsXml(T value)
+		* void \<T>.LogAsXml(T value, string prependText)
+		* void \<T>.LogAsXml(T value, string prependText, string appendText)
 	* [Console](#webkit.extensions.console)
-	* [Data management](#Webkit.Extensions.DataConversion)
+		* void ConsoleColor.Write(object value)
+		* void ConsoleColor.WriteLine(object value)
+	* [Data conversion](#Webkit.Extensions.DataConversion)
+		* string Stream.AsString()
+		* string string.Collapse()
+		* string IHeaderDictionary.AsString()
+		* string \<T>.AsJson()
+		* string \<T>.AsXml()
+		* string byte[].AsString()
+		* string byte[].AsString(Encoding encoding)
+		* byte[] string.AsByteArray()
+		* byte[] string.AsByteArray(Encoding encoding)
+	* [Compression](#Webkit.Extensions.Compression)
+		* byte[] byte[].GZipCompress(CompressionLevel level)
+		* byte[] byte[].GZipDecompress()
+		* byte[] byte[].BrotliCompress(CompressionLevel level)
+		* byte[] byte[].BrotliDecompress()
 1. [Security](#webkit.security)
+	* CryptographicGenerator
+		* string Seed(int length = 40)
+		* string UnicodeSeed(int length = 40)
+	* JsonSecurityToken
+	* Password.PasswordHandler
+		* string Hash(string password)
+		* bool Validate(string password, string hash)
 
 # Webkit.Extensions
 Webkit contains a couple extension methods to make data conversion and management a lot easier.
@@ -192,3 +224,59 @@ Generates a cryptographically safe and universally unique seed using the unicode
 ```cs
 CryptographicGenerator.UnicodeSeed(40); // ㉔ᩰ⩠ᇤみ᪸ㅇ┗᪄⯿㏹᰷┚₎ḇ◱⡈⚺ᅗ❽⁊ᐬ⫴⏿⺢ሱᴥᙵᙳᓃṵ⯱ᮈ⺶⽢᤹❽㏡⚐㊯-8DC39DE94A69998
 ```
+
+___
+
+## Authentication
+Webkit has a couple useful features to make authentication and authorization easier
+
+### `AuthenticateAttribute : ActionFilterAttribute`
+This attribute will check the validity of a user token before executing the action. The user token is stored in cokies under `token`.
+`AuthenticateAttribute` uses an in-memory cache to store sessions. These can be found in `UserSessionCache`.
+Set the `AuthenticateAttribute.Validate` action to implement your own method.
+
+### `AuthorizeAttribute : ActionFilterAttribute`
+This attribute will check if a user has a specified role but will NOT determine if the user is authenticated. Use the `AuthenticateAttribute` and `AuthorizeAttribute` on the same endpoint to check both.
+You can specify what role is required for the endpoint by setting `Role` in the attribute.
+
+Here is an example of how webkit authentication should be implemented.
+```cs
+[HttpPost("login")]
+public ActionResult Login([FromBody] LoginDto loginDto)
+{
+    using(MockDatabase mockDb = new MockDatabase())
+    {
+        List<User> users = mockDb.Users.Where(user => user.Username == loginDto.Username && PasswordHandler.Validate(loginDto.Password, user.Password)).ToList();
+        if(!users.Any())
+        {
+            return NotFound();
+        }
+
+        User user = users.First();
+        JsonSecurityToken jsonToken = new JsonSecurityToken(user.Id, user.Roles);
+
+        DateTime tokenExpiration = DateTime.Now.AddDays(30);
+        string token = UserSessionCache.Register(jsonToken, tokenExpiration);
+        user.Token = token;
+
+        mockDb.SaveChanges();
+
+        Response.Cookies.Append("token", token, new CookieOptions
+        {
+            Expires = tokenExpiration,
+        });
+        return Ok();
+    }
+}
+
+public class LoginDto
+{
+    public string Username { get; set; } = "";
+
+    public string Password { get; set; } = "";
+}
+```
+
+___
+
+## Telemetry

@@ -125,5 +125,89 @@ namespace Webkit.Extensions.DataConversion
                 }
             }
         }
+
+        /// <summary>
+        /// Converts a byte array to a string using utf8
+        /// </summary>
+        /// <param name="byteArray"></param>
+        /// <returns></returns>
+        public static string AsString(this byte[] byteArray)
+        {
+            return Encoding.UTF8.GetString(byteArray);
+        }
+
+        /// <summary>
+        /// Converts a byte array to a string using specified encoding
+        /// </summary>
+        /// <param name="byteArray"></param>
+        /// <param name="encoding"></param>
+        /// <returns></returns>
+        public static string AsString(this byte[] byteArray, Encoding encoding)
+        {
+            return encoding.GetString(byteArray);
+        }
+
+        /// <summary>
+        /// Converts a string to a byte array using utf8
+        /// </summary>
+        /// <param name="str"></param>
+        /// <returns></returns>
+        public static byte[] AsByteArray(this string str)
+        {
+            return Encoding.UTF8.GetBytes(str);
+        }
+
+        /// <summary>
+        /// Converts a string to a byte array using specified encoding
+        /// </summary>
+        /// <param name="str"></param>
+        /// <param name="encoding"></param>
+        /// <returns></returns>
+        public static byte[] AsByteArray(this string str, Encoding encoding)
+        {
+            return encoding.GetBytes(str);
+        }
+
+        /// <summary>
+        /// Joins an array into a string and returns it. Has no separator
+        /// </summary>
+        /// <param name="array"></param>
+        /// <returns></returns>
+        public static string AsString(this Array array)
+        {
+            return String.Join("", array);
+        }
+
+        /// <summary>
+        /// Joins an array into a string with separators and returns it.
+        /// </summary>
+        /// <param name="array"></param>
+        /// <param name="separator"></param>
+        /// <returns></returns>
+        public static string AsString(this Array array, string separator)
+        {
+            return String.Join(separator, array);
+        }
+
+        /// <summary>
+        /// Joins a list into a string and returns it. Has no separator
+        /// </summary>
+        /// <param name="list"></param>
+        /// <returns></returns>
+        public static string AsString<T>(this List<T> list)
+        {
+            return String.Join("", list);
+        }
+
+        /// <summary>
+        /// Joins a list into a string with separators and returns it.
+        /// </summary>
+        /// <param name="list"></param>
+        /// <param name="separator"></param>
+        /// <returns></returns>
+        public static string AsString<T>(this List<T> list, string separator)
+        {
+            return String.Join(separator, list);
+        }
     }
 }

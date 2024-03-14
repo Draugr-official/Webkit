@@ -11,7 +11,6 @@ namespace Webkit.Test.Controllers
     [ApiController]
     public class AuthenticationController : ControllerBase
     {
-        [Telemetry]
         [HttpPost("login")]
         public ActionResult Login([FromBody] LoginDto loginDto)
         {
@@ -24,7 +23,6 @@ namespace Webkit.Test.Controllers
                 }
 
                 User user = users.First();
-
                 JsonSecurityToken jsonToken = new JsonSecurityToken(user.Id, user.Roles);
 
                 DateTime tokenExpiration = DateTime.Now.AddDays(30);

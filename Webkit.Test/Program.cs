@@ -13,6 +13,8 @@ using System.Text;
 using System.Reflection;
 using Webkit.Email.SendGrid;
 using SendGrid.Helpers.Mail;
+using Webkit.Extensions.Compression;
+using Webkit.Extensions.DataConversion;
 
 namespace Webkit.Test
 {
@@ -20,7 +22,7 @@ namespace Webkit.Test
     {
         public static void Main(string[] args)
         {
-            AuthenticateAttribute.ValidateToken = bool (string token) =>
+            AuthenticateAttribute.Validate = bool (string token) =>
             {
                 using (MockDatabase db = new MockDatabase())
                 {
@@ -29,6 +31,9 @@ namespace Webkit.Test
             };
             Console.OutputEncoding = Encoding.Unicode;
             CryptographicGenerator.UnicodeSeed(40).Log();
+
+            string[] strArr = ["ah"];
+            strArr.Log();
 
             WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 

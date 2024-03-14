@@ -14,7 +14,7 @@ namespace Webkit.Test.Controllers
         [HttpGet]
         public ActionResult Get()
         {
-            return Ok(TelemetryInsight.Endpoints.AsJson());
+            return Ok(TelemetryInsight.Diagnostics.AsJson());
         }
     }
 }

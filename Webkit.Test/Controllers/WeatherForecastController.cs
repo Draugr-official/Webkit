@@ -19,6 +19,7 @@ namespace Webkit.Test.Controllers
             _logger = logger;
         }
 
+        [Telemetry]
         [Authenticate]
         [Authorize(Role = "Administrator")]
         [HttpGet(Name = "GetWeatherForecast")]
