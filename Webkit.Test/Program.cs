@@ -16,6 +16,7 @@ using SendGrid.Helpers.Mail;
 using Webkit.Extensions.Compression;
 using Webkit.Extensions.DataConversion;
 using Webkit.Data;
+using System.Diagnostics;
 
 namespace Webkit.Test
 {
@@ -23,18 +24,16 @@ namespace Webkit.Test
     {
         public static void Main(string[] args)
         {
-            for(int i = 0; i < 50; i++)
+            for(int i = 0; i < 100; i++)
             {
-                string firstName = TestData.FirstName();
-                string lastName = TestData.LastName();
-
-                string domain = TestData.Domain(firstName);
-                string email = TestData.Email(firstName, lastName, domain);
-
-                Console.WriteLine($"{firstName} {lastName}, {domain}, {email}");
+                PasswordHandler.Hash("abc");
+                i.Log("At iteration ");
             }
 
+            Console.WriteLine("Done");
+
             return;
+
             AuthenticateAttribute.Validate = bool (string token) =>
             {
                 using (MockDatabase db = new MockDatabase())
@@ -43,10 +42,6 @@ namespace Webkit.Test
                 }
             };
             Console.OutputEncoding = Encoding.Unicode;
-            CryptographicGenerator.UnicodeSeed(40).Log();
-
-            string[] strArr = ["ah"];
-            strArr.Log();
 
             WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
