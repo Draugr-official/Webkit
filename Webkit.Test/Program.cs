@@ -24,16 +24,11 @@ namespace Webkit.Test
     {
         public static void Main(string[] args)
         {
-            for(int i = 0; i < 100; i++)
-            {
-                PasswordHandler.Hash("abc");
-                i.Log("At iteration ");
-            }
-
-            Console.WriteLine("Done");
+            CommandLine cli = new CommandLine("dotnet");
+            string response = cli.Execute("echo yo");
+            response.Log("Response: ");
 
             return;
-
             AuthenticateAttribute.Validate = bool (string token) =>
             {
                 using (MockDatabase db = new MockDatabase())

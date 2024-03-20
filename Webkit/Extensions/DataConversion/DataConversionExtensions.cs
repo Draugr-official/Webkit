@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using System.Xml.Serialization;
 using System.Xml;
 using System.Runtime.Caching;
+using System.Runtime.CompilerServices;
 
 namespace Webkit.Extensions.DataConversion
 {

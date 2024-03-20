@@ -16,7 +16,7 @@ namespace Webkit.Test.Controllers
         {
             using(MockDatabase mockDb = new MockDatabase())
             {
-                List<User> users = mockDb.Users.Where(user => user.Username == loginDto.Username && PasswordHandler.Validate(loginDto.Password, user.Password)).ToList();
+                List<User> users = mockDb.Users.Where(user => user.Username == loginDto.Username && PasswordHandler.Verify(loginDto.Password, user.Password)).ToList();
                 if(!users.Any())
                 {
                     return NotFound();

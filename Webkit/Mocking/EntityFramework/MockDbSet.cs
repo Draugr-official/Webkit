@@ -8,5 +8,6 @@ namespace Webkit.Mocking.EntityFramework
 {
     public class MockDbSet<T> : List<T>
     {
+
     }
 }

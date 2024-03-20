@@ -19,6 +19,7 @@ namespace Webkit.Test.Controllers
             _logger = logger;
         }
 
+        [DisableRequestSizeLimit]
         [Telemetry]
         [Authenticate]
         [Authorize(Role = "Administrator")]
