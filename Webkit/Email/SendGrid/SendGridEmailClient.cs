@@ -10,24 +10,29 @@ using System.Threading.Tasks;
 
 namespace Webkit.Email.SendGrid
 {
-    public class SendGridEmail
+    public class SendGridEmailClient
     {
         SendGridClient SendGridClient { get; set; }
 
         EmailAddress Sender { get; set; }
 
-        EmailAddress Recipient { get; set; }
-
-        public SendGridEmail(EmailAddress sender, EmailAddress recipient, string apiKey)
+        public SendGridEmailClient(string apiKey, EmailAddress sender)
         {
             Sender = sender;
-            Recipient = recipient;
 
             SendGridClient = new SendGridClient(apiKey);
         }
 
-        public async Task<Response> Send(string subject, string body, string fallbackBody = "")
-            => await SendGridClient.SendEmailAsync(MailHelper.CreateSingleEmail(Sender, Recipient, subject, fallbackBody == "" ? body : fallbackBody, body));
+        /// <summary>
+        /// ACCEPTED = Good
+        /// </summary>
+        /// <param name="recipient"></param>
+        /// <param name="subject"></param>
+        /// <param name="htmlBody"></param>
+        /// <param name="rawBody"></param>
+        /// <returns></returns>
+        public async Task<Response> Send(EmailAddress recipient, string subject, string htmlBody, string rawBody = "")
+            => await SendGridClient.SendEmailAsync(MailHelper.CreateSingleEmail(Sender, recipient, subject, rawBody == "" ? htmlBody : rawBody, htmlBody));
     }
 
     public static class EmailAddressExtensions

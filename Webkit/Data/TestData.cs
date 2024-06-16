@@ -95,7 +95,7 @@ namespace Webkit.Data
         }
 
         /// <summary>
-        /// Returns a random email
+        /// Returns an email with specified first name. The last name and domain is random.
         /// </summary>
         public static string Email(string firstName)
         {
@@ -103,7 +103,7 @@ namespace Webkit.Data
         }
 
         /// <summary>
-        /// Returns a random email
+        /// Returns an email with specified first and last name. The domain is random.
         /// </summary>
         public static string Email(string firstName, string lastName)
         {
@@ -111,7 +111,7 @@ namespace Webkit.Data
         }
 
         /// <summary>
-        /// Returns a random email
+        /// Returns a fixed email
         /// </summary>
         public static string Email(string firstName, string lastName, string domain)
         {

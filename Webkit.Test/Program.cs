@@ -24,11 +24,6 @@ namespace Webkit.Test
     {
         public static void Main(string[] args)
         {
-            CommandLine cli = new CommandLine("dotnet");
-            string response = cli.Execute("echo yo");
-            response.Log("Response: ");
-
-            return;
             AuthenticateAttribute.Validate = bool (string token) =>
             {
                 using (MockDatabase db = new MockDatabase())

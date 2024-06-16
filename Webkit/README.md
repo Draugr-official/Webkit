@@ -280,3 +280,5 @@ public class LoginDto
 ___
 
 ## Telemetry
+
+Webkit has a telemetry attribute to make handling diagnostics as easy as possible.
