@@ -25,13 +25,6 @@ namespace Webkit.Test
     {
         public static void Main(string[] args)
         {
-            AuthenticateAttribute.Validate = bool (string token) =>
-            {
-                using (MockDatabase db = new MockDatabase())
-                {
-                    return db.Users.Any(user => user.Token == token);
-                }
-            };
             Console.OutputEncoding = Encoding.Unicode;
 
             WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
@@ -60,11 +53,28 @@ namespace Webkit.Test
 
             using (MockDatabase db = new MockDatabase())
             {
-                db.Migrate();
+                string firstName = TestData.FirstName();
+                string lastName = TestData.LastName();
+
+                db.Users.Add(new UserModel
+                {
+                    FirstName = firstName,
+                    LastName = lastName,
+                    Username = "andbjorn",
+                    Email = TestData.Email(firstName, lastName),
+                    Password = PasswordHandler.Hash("123"),
+                    Roles = new List<string>
+                    {
+                        "Users",
+                        "Administrator",
+                    }
+                });
+
+                db.SaveChanges();
             }
 
 
-                app.MapControllers();
+            app.MapControllers();
 
             app.Run();
         }

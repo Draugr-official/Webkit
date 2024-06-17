@@ -12,6 +12,7 @@ using Webkit.Security.Password;
 using Webkit.Security;
 using Webkit.Sessions;
 using Webkit.Models.EntityFramework;
+using Webkit.Architectures.Default.DTOs;
 
 namespace Webkit.Architectures.Default
 {
@@ -19,7 +20,7 @@ namespace Webkit.Architectures.Default
     {
         public static void Load(WebApplication app, string sqlConnectionString)
         {
-            app.MapPost("authentication/login", Login);
+            app.MapPost("api/authentication/login", Login);
         }
 
         static public ActionResult Login(HttpContext ctx, [FromBody] LoginDto loginDto)
