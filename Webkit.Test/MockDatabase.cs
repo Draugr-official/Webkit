@@ -1,4 +1,7 @@
-﻿using Webkit.Mocking.EntityFramework;
+﻿using Microsoft.EntityFrameworkCore;
+using System.Runtime.CompilerServices;
+using Webkit.Architectures.Default;
+using Webkit.Mocking.EntityFramework;
 using Webkit.Models.EntityFramework;
 using Webkit.Security.Password;
 
@@ -51,47 +54,12 @@ namespace Webkit.Test
         public Guid ChannelId { get; set; }
     }
 
-    public class MockDatabase : MockDbContext
+    public class MockDatabase : DefaultArchitectureDatabaseContext
     {
         public static Guid ChannelId = Guid.NewGuid();
 
         public static Guid Test1UserId = Guid.NewGuid();
         public static Guid RashUserId = Guid.NewGuid();
-
-        public MockDbSet<User> Users { get; set; } = new MockDbSet<User>
-            {
-                new User
-                    {
-                        Id = "1",
-                        Username = "Test1",
-                        Password = PasswordHandler.Hash("abc"),
-                        Email = "Yoer@google.com",
-                        Roles = new List<string>
-                        {
-                            "Administrator",
-                            "User"
-                        },
-                        Channels = new List<Guid>
-                        {
-                            ChannelId
-                        },
-                    },
-                new User
-                    {
-                        Id = "2",
-                        Username = "Rash",
-                        Password = PasswordHandler.Hash("123"),
-                        Email = "Balter@google.com",
-                        Roles = new List<string>
-                        {
-                            "User"
-                        },
-                        Channels = new List<Guid>
-                        {
-                            ChannelId
-                        },
-                    },
-            };
 
         public MockDbSet<Channel> Channels { get; set; } = new MockDbSet<Channel>
             {
@@ -116,5 +84,10 @@ namespace Webkit.Test
                     UserId = RashUserId,
                 },
             };
+
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        {
+            optionsBuilder.UseInMemoryDatabase("Testdb");
+        }
     }
 }

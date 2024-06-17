@@ -36,9 +36,9 @@ namespace Webkit.Security
         /// <summary>
         /// <inheritdoc cref="SecureToken"/>
         /// </summary>
-        public JsonSecurityToken(string userId, List<string> roles)
+        public JsonSecurityToken(long userId, List<string> roles)
         {
-            UserId = userId;
+            UserId = userId.ToString();
             Signature = CryptographicGenerator.Seed();
             Roles = roles;
         }

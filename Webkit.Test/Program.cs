@@ -17,6 +17,7 @@ using Webkit.Extensions.Compression;
 using Webkit.Extensions.DataConversion;
 using Webkit.Data;
 using System.Diagnostics;
+using Webkit.Architectures.Default;
 
 namespace Webkit.Test
 {
@@ -55,8 +56,15 @@ namespace Webkit.Test
 
             app.UseAuthorization();
 
+            DefaultArchitecturePack.Load(app, "");
 
-            app.MapControllers();
+            using (MockDatabase db = new MockDatabase())
+            {
+                db.Migrate();
+            }
+
+
+                app.MapControllers();
 
             app.Run();
         }
