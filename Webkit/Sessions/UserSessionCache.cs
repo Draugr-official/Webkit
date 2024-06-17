@@ -77,8 +77,6 @@ namespace Webkit.Sessions
         /// <returns></returns>
         public static bool IsValid(string token)
         {
-            String.Join("\n", Cache.Select(t => t.Key + ": " + t.Value)).Log();
-
             return Cache.Contains(token);
         }
     }
