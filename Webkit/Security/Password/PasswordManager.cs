@@ -10,7 +10,7 @@ using Webkit.Extensions.DataConversion;
 
 namespace Webkit.Security.Password
 {
-    public class PasswordHandler
+    public class PasswordManager
     {
         /// <summary>
         /// Hashes the password with a random salt

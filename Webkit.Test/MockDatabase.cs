@@ -56,38 +56,9 @@ namespace Webkit.Test
 
     public class MockDatabase : DefaultArchitectureDatabaseContext
     {
-        public static Guid ChannelId = Guid.NewGuid();
-
-        public static Guid Test1UserId = Guid.NewGuid();
-        public static Guid RashUserId = Guid.NewGuid();
-
-        public MockDbSet<Channel> Channels { get; set; } = new MockDbSet<Channel>
-            {
-                new Channel
-                {
-                    Id = ChannelId,
-                    Name = "E-commerce project",
-                    Type = ChannelType.Group,
-                }
-            };
-
-        public MockDbSet<ChannelBinding> Bindings { get; set; } = new MockDbSet<ChannelBinding>
-            {
-                new ChannelBinding
-                {
-                    ChannelId = ChannelId,
-                    UserId = Test1UserId,
-                },
-                new ChannelBinding
-                {
-                    ChannelId = ChannelId,
-                    UserId = RashUserId,
-                },
-            };
-
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.UseInMemoryDatabase("Testdb");
+            optionsBuilder.UseInMemoryDatabase("Proddb");
         }
     }
 }

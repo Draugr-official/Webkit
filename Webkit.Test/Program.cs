@@ -49,7 +49,15 @@ namespace Webkit.Test
 
             app.UseAuthorization();
 
-            DefaultArchitecturePack.Load(app, "");
+            DefaultArchitecturePack<MockDatabase>.Load(new DefaultArchitectureConfig
+            {
+                ApplicationName = "Webkit.Test",
+
+                WebApp = app,
+                SendGridApiKey = Environment.GetEnvironmentVariable("SENDGRID_API_KEY") ?? "",
+                SenderEmailAddress = "notifications@reckon.no",
+                SenderEmailName = "Reckon"
+            });
 
             using (MockDatabase db = new MockDatabase())
             {
@@ -62,7 +70,7 @@ namespace Webkit.Test
                     LastName = lastName,
                     Username = "andbjorn",
                     Email = TestData.Email(firstName, lastName),
-                    Password = PasswordHandler.Hash("123"),
+                    Password = PasswordManager.Hash("123"),
                     Roles = new List<string>
                     {
                         "Users",

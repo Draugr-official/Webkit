@@ -13,41 +13,35 @@ using Webkit.Security;
 using Webkit.Sessions;
 using Webkit.Models.EntityFramework;
 using Webkit.Architectures.Default.DTOs;
+using Microsoft.EntityFrameworkCore;
+using System.Reflection;
+using Webkit.Extensions.Logging;
+using Webkit.Attributes;
+using Webkit.Architectures.Default.Endpoints;
 
 namespace Webkit.Architectures.Default
 {
-    public class DefaultArchitecturePack
+    /// <summary>
+    /// An architecture pack used to automatically set up the application for a certain application architecture style
+    /// <para>Registers 3 new endpoints.</para>
+    /// <list type="bullet">
+    ///     <item>api/authentication/login</item>
+    ///     <item>api/authentication/register</item>
+    ///     <item>api/authentication/verify</item>
+    /// </list>
+    /// </summary>
+    /// <typeparam name="T">The DbContext of your application - MUST be derived from DefaultArchitectureDatabaseContext</typeparam>
+    public class DefaultArchitecturePack<T> where T : new()
     {
-        public static void Load(WebApplication app, string sqlConnectionString)
+        public static DefaultArchitectureConfig Config { get; set; } = new DefaultArchitectureConfig();
+
+        public static void Load(DefaultArchitectureConfig config)
         {
-            app.MapPost("api/authentication/login", Login);
-        }
+            Config = config;
 
-        static public ActionResult Login(HttpContext ctx, [FromBody] LoginDto loginDto)
-        {
-            using (DefaultArchitectureDatabaseContext db = new DefaultArchitectureDatabaseContext())
-            {
-                List<UserModel> users = db.Users.Where(user => user.Username == loginDto.Username && PasswordHandler.Verify(loginDto.Password, user.Password)).ToList();
-                if (!users.Any())
-                {
-                    return new NotFoundResult();
-                }
-
-                UserModel user = users.First();
-                JsonSecurityToken jsonToken = new JsonSecurityToken(user.Id, user.Roles);
-
-                DateTime tokenExpiration = DateTime.Now.AddDays(30);
-                string token = UserSessionCache.Register(jsonToken, tokenExpiration);
-                user.Token = token;
-
-                db.SaveChanges();
-
-                ctx.Response.Cookies.Append("token", token, new CookieOptions
-                {
-                    Expires = tokenExpiration,
-                });
-                return new OkResult();
-            }
+            config.WebApp.MapPost("api/authentication/login", LoginEndpoint<T>.Login);
+            config.WebApp.MapPost("api/authentication/register", RegisterEndpoint<T>.Register);
+            config.WebApp.MapPost("api/authentication/verify", VerifyEndpoint<T>.Verify);
         }
     }
 }

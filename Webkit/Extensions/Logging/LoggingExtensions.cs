@@ -81,33 +81,36 @@ namespace Webkit.Extensions.Logging
         /// <summary>
         /// Writes the value to the default output.
         /// </summary>
-        public static void Log<T>(this T value)
+        public static T Log<T>(this T value)
         {
             if (value == null)
             {
                 DefaultLog("null");
-                return;
+                return value;
             }
 
             DefaultLog(value);
+            return value;
         }
 
         /// <summary>
         /// <inheritdoc cref="Log{T}(T)"/>
         /// Prepends text to the beginning of the value.
         /// </summary>
-        public static void Log<T>(this T value, string prependText)
+        public static T Log<T>(this T value, string prependText)
         {
             Log(prependText + value);
+            return value;
         }
 
         /// <summary>
         /// <inheritdoc cref="Log{T}(T)"/>
         /// Prepends text to the beginning and appends text to the ending of the value.
         /// </summary>
-        public static void Log<T>(this T value, string prependText, string appendText)
+        public static T Log<T>(this T value, string prependText, string appendText)
         {
             Log(prependText + value + appendText);
+            return value;
         }
 
 

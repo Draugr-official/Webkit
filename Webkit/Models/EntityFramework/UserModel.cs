@@ -31,6 +31,10 @@ namespace Webkit.Models.EntityFramework
 
         public List<string> Roles { get; set; } = new List<string>();
 
-        internal string Token { get; set; } = "";
+        public string VerificationCode { get; set; } = "";
+
+        public bool IsVerified { get; set; }
+
+        public string Token { get; set; } = "";
     }
 }

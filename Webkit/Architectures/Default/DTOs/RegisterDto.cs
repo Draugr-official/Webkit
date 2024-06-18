@@ -8,11 +8,23 @@ using System.Threading.Tasks;
 
 namespace Webkit.Architectures.Default.DTOs
 {
-    public class LoginDto
+    internal class RegisterDto
     {
+        [DefaultValue("Andy")]
+        [JsonPropertyName("firstName")]
+        public string FirstName { get; set; } = "";
+
+        [DefaultValue("Jacobsen")]
+        [JsonPropertyName("lastName")]
+        public string LastName { get; set; } = "";
+
         [DefaultValue("andbjorn")]
         [JsonPropertyName("username")]
         public string Username { get; set; } = "";
+
+        [DefaultValue("andbjornwil@gmail.com")]
+        [JsonPropertyName("email")]
+        public string Email { get; set; } = "";
 
         [DefaultValue("123")]
         [JsonPropertyName("password")]

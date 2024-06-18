@@ -12,7 +12,8 @@ namespace Webkit.Sessions
     public class UserSessionCache
     {
         /// <summary>
-        /// Session duration in minutes
+        /// Determines how long a session can last, in minutes.</br>
+        /// Defaults to two hours.
         /// </summary>
         public static int Duration = 60 * 2;
 

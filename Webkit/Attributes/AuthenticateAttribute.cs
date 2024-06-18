@@ -30,8 +30,9 @@ namespace Webkit.Attributes
         {
             if (context.HttpContext.Request.Cookies.TryGetValue("token", out string token))
             {
-                string rawJsonSecurityToken = Encoding.UTF8.GetString(Convert.FromBase64String(token));
-                JsonSecurityToken? jsonSecurityToken = JsonSecurityToken.FromString(rawJsonSecurityToken);
+                token.Log("Token: ");
+
+                JsonSecurityToken? jsonSecurityToken = JsonSecurityToken.FromString(Encoding.UTF8.GetString(Convert.FromBase64String(token)).Log("Bruv: "));
                 if (jsonSecurityToken == null)
                 {
                     context.Result = new BadRequestResult();
