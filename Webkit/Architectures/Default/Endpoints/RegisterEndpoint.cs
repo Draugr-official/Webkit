@@ -44,46 +44,52 @@ namespace Webkit.Architectures.Default.Endpoints
                 return Results.BadRequest("Invalid email address");
             }
 
-            VerificationCode verificationCode = new VerificationCode();
-
             UserModel user = new UserModel
             {
                 Username = registerDto.Username,
                 FirstName = registerDto.FirstName,
                 LastName = registerDto.LastName,
                 Email = registerDto.Email,
-                VerificationCode = verificationCode,
                 Roles = new List<string>
                 {
                     "User"
                 }
             };
 
-            db.Users.Add(user);
-
-            SendGridEmailClient emailClient = new SendGridEmailClient(DefaultArchitecturePack<T>.Config.SendGridApiKey, new EmailAddress(DefaultArchitecturePack<T>.Config.SenderEmailAddress, DefaultArchitecturePack<T>.Config.SenderEmailName));
-            SendGrid.Response emailResponse = emailClient.Send(
-                recipient: recipient,
-                subject: $"Welcome to {DefaultArchitecturePack<T>.Config.ApplicationName}",
-                htmlBody: $"Your verification code is {verificationCode}",
-                rawBody: $"Your verification code is {verificationCode}").Result;
-
-            if(!emailResponse.IsSuccessStatusCode)
+            if(DefaultArchitecturePack<T>.Config.RequireVerification)
             {
-                return Results.Problem("Could not send verification email");
+
+                VerificationCode verificationCode = new VerificationCode();
+                user.VerificationCode = verificationCode;
+
+                SendGridEmailClient emailClient = new SendGridEmailClient(DefaultArchitecturePack<T>.Config.SendGridApiKey, new EmailAddress(DefaultArchitecturePack<T>.Config.SenderEmailAddress, DefaultArchitecturePack<T>.Config.SenderEmailName));
+                SendGrid.Response emailResponse = emailClient.Send(
+                    recipient: recipient,
+                    subject: $"Welcome to {DefaultArchitecturePack<T>.Config.ApplicationName}",
+                    htmlBody: $"Your verification code is {verificationCode}",
+                    rawBody: $"Your verification code is {verificationCode}"
+                ).Result;
+
+                if (!emailResponse.IsSuccessStatusCode)
+                {
+                    return Results.Problem("Could not send verification email");
+                }
             }
 
-            db.SaveChanges();
-
             JsonSecurityToken jsonToken = new JsonSecurityToken(user.Id, user.Roles);
-
             DateTime tokenExpiration = DateTime.Now.AddMinutes(UserSessionCache.Duration);
-            string token = UserSessionCache.Register(jsonToken, tokenExpiration);
 
-            ctx.Response.Cookies.Append("token", token, new CookieOptions
+            ctx.Response.Cookies.Append("token", jsonToken.AsBase64String(), new CookieOptions
             {
                 Expires = tokenExpiration,
             });
+
+            user.SessionToken = jsonToken.AsBase64String();
+            user.SessionDuration = tokenExpiration;
+
+            db.Users.Add(user);
+            db.SaveChanges();
+
             return Results.Ok();
         }
     }

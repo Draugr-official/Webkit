@@ -24,38 +24,29 @@ namespace Webkit.Architectures.Default.Endpoints
                     throw new Exception($"Db {typeof(T)} cannot be null!");
                 }
 
-                List<UserModel> users = db.Users.Where(user => user.Username == verifyDto.Username && PasswordManager.Verify(verifyDto.Password, user.Password)).ToList();
+                List<UserModel> users = db.Users.Where(user => user.SessionToken == ctx.Request.Cookies["token"] && user.SessionDuration > DateTime.Now).ToList();
                 if (!users.Any())
                 {
-                    return Results.NotFound();
+                    return Results.Unauthorized();
                 }
 
                 UserModel user = users.First();
 
-                if (UserSessionCache.IsValid(user.Token))
+                if(user.IsVerified)
                 {
-                    UserSessionCache.RefreshDuration(user.Token);
-
-                    ctx.Response.Cookies.Append("token", user.Token, new CookieOptions
-                    {
-                        Expires = DateTime.Now.AddMinutes(UserSessionCache.Duration),
-                    });
-                    return Results.Ok();
+                    return Results.Ok("Already verified");
                 }
 
-                // If a session does not already exist, create a new one.
-                JsonSecurityToken jsonToken = new JsonSecurityToken(user.Id, user.Roles);
+                if(user.VerificationCode != verifyDto.VerificationCode)
+                {
+                    return Results.BadRequest("Invalid verification code");
+                }
 
-                DateTime tokenExpiration = DateTime.Now.AddMinutes(UserSessionCache.Duration);
-                string token = UserSessionCache.Register(jsonToken, tokenExpiration);
-                user.Token = token;
+                user.IsVerified = true;
+                user.VerificationCode = "";
 
                 db.SaveChanges();
 
-                ctx.Response.Cookies.Append("token", token, new CookieOptions
-                {
-                    Expires = tokenExpiration,
-                });
                 return Results.Ok();
             }
         }

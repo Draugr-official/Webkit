@@ -35,6 +35,10 @@ namespace Webkit.Models.EntityFramework
 
         public bool IsVerified { get; set; }
 
-        public string Token { get; set; } = "";
+        public string SessionToken { get; set; } = "";
+
+        public DateTime SessionDuration { get; set; }
+
+        public DateTime Created { get; set; } = DateTime.Now;
     }
 }

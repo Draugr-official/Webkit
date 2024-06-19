@@ -54,6 +54,7 @@ namespace Webkit.Test
                 ApplicationName = "Webkit.Test",
 
                 WebApp = app,
+                RequireVerification = true,
                 SendGridApiKey = Environment.GetEnvironmentVariable("SENDGRID_API_KEY") ?? "",
                 SenderEmailAddress = "notifications@reckon.no",
                 SenderEmailName = "Reckon"
@@ -69,12 +70,25 @@ namespace Webkit.Test
                     FirstName = firstName,
                     LastName = lastName,
                     Username = "andbjorn",
-                    Email = TestData.Email(firstName, lastName),
+                    Email = "andbjornwil@gmail.com",
                     Password = PasswordManager.Hash("123"),
                     Roles = new List<string>
                     {
                         "Users",
                         "Administrator",
+                    }
+                });
+
+                db.Users.Add(new UserModel
+                {
+                    FirstName = firstName,
+                    LastName = lastName,
+                    Username = "test",
+                    Email = "andbjornwil@gmail.com",
+                    Password = PasswordManager.Hash("123"),
+                    Roles = new List<string>
+                    {
+                        "Users",
                     }
                 });
 

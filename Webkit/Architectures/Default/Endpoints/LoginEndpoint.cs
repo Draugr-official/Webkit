@@ -32,30 +32,29 @@ namespace Webkit.Architectures.Default.Endpoints
 
                 UserModel user = users.First();
 
-                if (UserSessionCache.IsValid(user.Token))
+                if(user.SessionDuration > DateTime.Now)
                 {
-                    UserSessionCache.RefreshDuration(user.Token);
-
-                    ctx.Response.Cookies.Append("token", user.Token, new CookieOptions
+                    ctx.Response.Cookies.Append("token", user.SessionToken, new CookieOptions
                     {
-                        Expires = DateTime.Now.AddMinutes(UserSessionCache.Duration),
+                        Expires = DateTime.Now.AddMinutes(UserSessionCache.Duration)
                     });
+
                     return Results.Ok();
                 }
 
-                // If a session does not already exist, create a new one.
                 JsonSecurityToken jsonToken = new JsonSecurityToken(user.Id, user.Roles);
-
                 DateTime tokenExpiration = DateTime.Now.AddMinutes(UserSessionCache.Duration);
-                string token = UserSessionCache.Register(jsonToken, tokenExpiration);
-                user.Token = token;
+
+                user.SessionToken = jsonToken.AsBase64String();
+                user.SessionDuration = tokenExpiration;
 
                 db.SaveChanges();
 
-                ctx.Response.Cookies.Append("token", token, new CookieOptions
+                ctx.Response.Cookies.Append("token", jsonToken.AsBase64String(), new CookieOptions
                 {
                     Expires = tokenExpiration,
                 });
+
                 return Results.Ok();
             }
         }

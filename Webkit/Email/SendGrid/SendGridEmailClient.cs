@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using Webkit.Extensions.Logging;
 
 namespace Webkit.Email.SendGrid
 {
@@ -43,15 +44,18 @@ namespace Webkit.Email.SendGrid
         /// <param name="emailAddress"></param>
         public static bool IsValid(this EmailAddress emailAddress)
         {
+            "Is empty?".Log();
             if (string.IsNullOrWhiteSpace(emailAddress.Email))
                 return false;
 
             try
             {
-                return Regex.IsMatch(emailAddress.Email, @"(.*)@([a-zA-Z0-9\\-].*)\\.([a-zA-Z].*)", RegexOptions.Compiled, TimeSpan.FromMilliseconds(500));
+                "Regex matches?".Log();
+                return Regex.IsMatch(emailAddress.Email, @"(.*)@([a-zA-Z0-9\-].*)\.([a-zA-Z].*)", RegexOptions.Compiled, TimeSpan.FromMilliseconds(500));
             }
             catch
             {
+                "Exception during regex match".Log();
                 return false;
             }
         }

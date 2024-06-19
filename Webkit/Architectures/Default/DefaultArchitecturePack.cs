@@ -41,7 +41,29 @@ namespace Webkit.Architectures.Default
 
             config.WebApp.MapPost("api/authentication/login", LoginEndpoint<T>.Login);
             config.WebApp.MapPost("api/authentication/register", RegisterEndpoint<T>.Register);
-            config.WebApp.MapPost("api/authentication/verify", VerifyEndpoint<T>.Verify);
+            
+            if(config.RequireVerification)
+            {
+                config.WebApp.MapPost("api/authentication/verify", VerifyEndpoint<T>.Verify);
+            }
+
+            AuthenticateAttribute.Validate = (string token) =>
+            {
+                using (DefaultArchitectureDatabaseContext? db = new T() as DefaultArchitectureDatabaseContext)
+                {
+                    if (db is null)
+                    {
+                        throw new Exception($"Db {typeof(T)} cannot be null!");
+                    }
+
+                    if(db.Users.Any(user => user.SessionToken == token && user.SessionDuration > DateTime.Now))
+                    {
+                        return true;
+                    }
+                }
+
+                return false;
+            };
         }
     }
 }
