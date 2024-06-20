@@ -15,9 +15,26 @@ namespace Webkit.Architectures.Default
         public string ApplicationName { get; set; } = "";
 
         /// <summary>
-        /// Determines if the application will open the api/authentication/verify endpoint and send out verification codes on email to clients
+        /// Determines if the application will open the 'api/authentication/verify' endpoint and send out verification codes on email to clients
         /// </summary>
-        public bool RequireVerification { get; set; }
+        public bool UseAccountVerification { get; set; }
+
+        /// <summary>
+        /// Determines if the application will open the 'api/telemetry' endpoint and log all responses to create a diagnostics schematic
+        /// </summary>
+        public bool UseTelemetry { get; set; }
+
+        /// <summary>
+        /// Determines the role name required to access sensitive information such as telemetry data set up by <see cref="DefaultArchitecturePack{T}"/>
+        /// <para>Default is 'Administrator'.</para>
+        /// </summary>
+        public string AdministratorRoleName { get; set; } = "Administrator";
+
+        /// <summary>
+        /// Determines how long a user session should last after logging in before the session expires (in minutes)
+        /// <para>Defaulted to 43 200 minutes (30 days)</para>
+        /// </summary>
+        public int UserSessionLength { get; set; } = 60 * 24 * 30;
 
         /// <summary>
         /// The API key used for sending emails with sendgrid

@@ -25,8 +25,6 @@ namespace Webkit.Test
     {
         public static void Main(string[] args)
         {
-            Console.OutputEncoding = Encoding.Unicode;
-
             WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
             // Add services to the container.
@@ -49,12 +47,14 @@ namespace Webkit.Test
 
             app.UseAuthorization();
 
-            DefaultArchitecturePack<MockDatabase>.Load(new DefaultArchitectureConfig
+            DefaultArchitecturePack.Load<MockDatabase>(new DefaultArchitectureConfig
             {
                 ApplicationName = "Webkit.Test",
-
                 WebApp = app,
-                RequireVerification = true,
+
+                UseAccountVerification = true,
+                UseTelemetry = true,
+
                 SendGridApiKey = Environment.GetEnvironmentVariable("SENDGRID_API_KEY") ?? "",
                 SenderEmailAddress = "notifications@reckon.no",
                 SenderEmailName = "Reckon"
@@ -65,7 +65,7 @@ namespace Webkit.Test
                 string firstName = TestData.FirstName();
                 string lastName = TestData.LastName();
 
-                db.Users.Add(new UserModel
+                db.Users.Add(new User
                 {
                     FirstName = firstName,
                     LastName = lastName,
@@ -76,10 +76,10 @@ namespace Webkit.Test
                     {
                         "Users",
                         "Administrator",
-                    }
+                    },
                 });
 
-                db.Users.Add(new UserModel
+                db.Users.Add(new User
                 {
                     FirstName = firstName,
                     LastName = lastName,
@@ -89,7 +89,7 @@ namespace Webkit.Test
                     Roles = new List<string>
                     {
                         "Users",
-                    }
+                    },
                 });
 
                 db.SaveChanges();

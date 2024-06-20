@@ -11,7 +11,7 @@ namespace Webkit.Architectures.Default
 {
     public class DefaultArchitectureDatabaseContext : DbContext
     {
-        public DbSet<UserModel> Users { get; set; }
+        public virtual DbSet<UserModel> Users { get; set; }
     }
 
     public static class DefaultArchitectureDatabaseContextExtensions

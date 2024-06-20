@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Text.Json.Serialization;
@@ -18,15 +19,15 @@ namespace Webkit.Architectures.Default.DTOs
         [JsonPropertyName("lastName")]
         public string LastName { get; set; } = "";
 
-        [DefaultValue("andbjorn")]
+        [Required]
         [JsonPropertyName("username")]
         public string Username { get; set; } = "";
 
-        [DefaultValue("andbjornwil@gmail.com")]
+        [Required]
         [JsonPropertyName("email")]
         public string Email { get; set; } = "";
 
-        [DefaultValue("123")]
+        [Required]
         [JsonPropertyName("password")]
         public string Password { get; set; } = "";
     }

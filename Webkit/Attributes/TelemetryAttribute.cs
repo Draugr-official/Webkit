@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc.Filters;
 using System.Collections.Specialized;
 using System.Runtime.Caching;
+using Webkit.Architectures.Default;
 using Webkit.Extensions;
 using Webkit.Extensions.Console;
 using Webkit.Extensions.DataConversion;
@@ -75,16 +76,19 @@ namespace Webkit.Attributes
 
         public override void OnResultExecuted(ResultExecutedContext context)
         {
-            Log(new TelemetryData
+            if(DefaultArchitecturePack.Config.UseTelemetry)
             {
-                IsSuccess = context.HttpContext.Response.StatusCode < 400,
-                HttpStatusCode = context.HttpContext.Response.StatusCode,
-                Timestamp = DateTime.Now,
-                Headers = context.HttpContext.Request.Headers,
-                HttpMethod = context.HttpContext.Request.Method,
-                Path = context.HttpContext.Request.Path,
-                Content = context.HttpContext.Request.Body.CanRead ? context.HttpContext.Request.Body.AsString() : ""
-            });
+                Log(new TelemetryData
+                {
+                    IsSuccess = context.HttpContext.Response.StatusCode < 400,
+                    HttpStatusCode = context.HttpContext.Response.StatusCode,
+                    Timestamp = DateTime.Now,
+                    Headers = context.HttpContext.Request.Headers,
+                    HttpMethod = context.HttpContext.Request.Method,
+                    Path = context.HttpContext.Request.Path,
+                    Content = context.HttpContext.Request.Body.CanRead ? context.HttpContext.Request.Body.AsString() : ""
+                });
+            }
         }
     }
 

@@ -30,21 +30,31 @@ namespace Webkit.Architectures.Default
     ///     <item>api/authentication/verify</item>
     /// </list>
     /// </summary>
-    /// <typeparam name="T">The DbContext of your application - MUST be derived from DefaultArchitectureDatabaseContext</typeparam>
-    public class DefaultArchitecturePack<T> where T : new()
+    public class DefaultArchitecturePack
     {
         public static DefaultArchitectureConfig Config { get; set; } = new DefaultArchitectureConfig();
 
-        public static void Load(DefaultArchitectureConfig config)
+        /// <summary>
+        /// Loads the pack into the application
+        /// </summary>
+        /// <typeparam name="T">The DbContext of your application - MUST be derived from DefaultArchitectureDatabaseContext</typeparam>
+        /// <param name="config"></param>
+        /// <exception cref="Exception"></exception>
+        public static void Load<T>(DefaultArchitectureConfig config) where T : new()
         {
             Config = config;
 
-            config.WebApp.MapPost("api/authentication/login", LoginEndpoint<T>.Login);
-            config.WebApp.MapPost("api/authentication/register", RegisterEndpoint<T>.Register);
+            config.WebApp.MapPost("api/authentication/login", Authentication.Login<T>);
+            config.WebApp.MapPost("api/authentication/register", Authentication.Register<T>);
             
-            if(config.RequireVerification)
+            if(config.UseAccountVerification)
             {
-                config.WebApp.MapPost("api/authentication/verify", VerifyEndpoint<T>.Verify);
+                config.WebApp.MapPost("api/authentication/verify", Authentication.Verify<T>);
+            }
+
+            if(config.UseTelemetry)
+            {
+                config.WebApp.MapGet("api/telemetry", TelemetryEndpoint.Telemetry);
             }
 
             AuthenticateAttribute.Validate = (string token) =>
