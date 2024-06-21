@@ -20,7 +20,7 @@ namespace Webkit.Architectures.Default.Endpoints
     {
         [Authenticate]
         [Authorize(Role = "Administrator")]
-        static public IResult Telemetry()
+        public static IResult Telemetry()
         {
             return Results.Ok(TelemetryInsight.Diagnostics.AsJson());
         }

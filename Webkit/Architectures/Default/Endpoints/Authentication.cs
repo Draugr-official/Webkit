@@ -1,10 +1,5 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Webkit.Architectures.Default.DTOs;
 using Webkit.Models.EntityFramework;
 using Webkit.Security.Password;
@@ -14,6 +9,7 @@ using SendGrid.Helpers.Mail;
 using Webkit.Email.SendGrid;
 using Webkit.Security.TwoFactorAuthentication;
 using Webkit.Attributes;
+using System.Diagnostics;
 
 namespace Webkit.Architectures.Default.Endpoints
 {
@@ -29,7 +25,7 @@ namespace Webkit.Architectures.Default.Endpoints
         /// <returns></returns>
         /// <exception cref="Exception"></exception>
         [Telemetry]
-        static public IResult Login<T>(HttpContext ctx, [FromBody] LoginDto loginDto) where T : new()
+        public static IResult Login<T>(HttpContext ctx, [FromBody] LoginDto loginDto) where T : new()
         {
             T dbType = new T();
             if (dbType is not DefaultArchitectureDatabaseContext)
@@ -74,8 +70,10 @@ namespace Webkit.Architectures.Default.Endpoints
                 Expires = tokenExpiration,
             });
 
+            Activity.Current.SetStatus(ActivityStatusCode.Ok);
+
             return Results.Ok();
-            
+
         }
 
         /// <summary>
@@ -88,7 +86,7 @@ namespace Webkit.Architectures.Default.Endpoints
         /// <returns></returns>
         /// <exception cref="Exception"></exception>
         [Telemetry]
-        static public IResult Register<T>(HttpContext ctx, [FromBody] RegisterDto registerDto) where T : new()
+        public static IResult Register<T>(HttpContext ctx, [FromBody] RegisterDto registerDto) where T : new()
         {
             T dbType = new T();
             if (dbType is not DefaultArchitectureDatabaseContext)
@@ -145,7 +143,7 @@ namespace Webkit.Architectures.Default.Endpoints
 
                 if (!emailResponse.IsSuccessStatusCode)
                 {
-                    return Results.Problem("Could not send verification email");
+                    return Results.BadRequest("Could not send verification email");
                 }
             }
             else
@@ -180,10 +178,10 @@ namespace Webkit.Architectures.Default.Endpoints
         /// <exception cref="Exception">Throws an exception if T is null</exception>
         [Telemetry]
         [Authenticate]
-        static public IResult Verify<T>(HttpContext ctx, [FromBody] VerifyDto verifyDto) where T : new()
+        public static IResult Verify<T>(HttpContext ctx, [FromBody] VerifyDto verifyDto) where T : new()
         {
             T dbType = new T();
-            if(dbType is not DefaultArchitectureDatabaseContext)
+            if (dbType is not DefaultArchitectureDatabaseContext)
             {
                 throw new Exception($"{typeof(T)} has to be derived from {nameof(DefaultArchitectureDatabaseContext)}!");
             }
