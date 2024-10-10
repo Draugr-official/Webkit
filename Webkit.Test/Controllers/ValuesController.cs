@@ -8,8 +8,9 @@ namespace Webkit.Test.Controllers
     [ApiController]
     public class ValuesController : ControllerBase
     {
+        [Telemetry]
         [Authenticate]
-        [Authorize(Role = "Admin")]
+        [Authorize(Role = "Administrator")]
         [HttpGet]
         public ActionResult Get()
         {

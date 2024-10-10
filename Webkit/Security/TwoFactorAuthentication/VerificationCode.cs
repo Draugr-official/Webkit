@@ -17,7 +17,7 @@ namespace Webkit.Security.TwoFactorAuthentication
 
         string Code { get; set; }
 
-        public VerificationCode(int length = 6, VerificationCodeTypes type = VerificationCodeTypes.Letters | VerificationCodeTypes.Numbers)
+        public VerificationCode(int length = 6, VerificationCodeTypes type = VerificationCodeTypes.Numbers)
         {
             string codeChoices = string.Empty;
 
@@ -30,6 +30,11 @@ namespace Webkit.Security.TwoFactorAuthentication
         public static implicit operator string (VerificationCode verificationCode)
         {
             return verificationCode.Code;
+        }
+
+        public override string ToString()
+        {
+            return Code;
         }
     }
 

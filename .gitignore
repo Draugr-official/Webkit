@@ -361,3 +361,5 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+/Webkit.Test/Properties/launchSettings.json
+/Webkit.Test/Properties/launchSettings.json

@@ -13,41 +13,67 @@ using Webkit.Security;
 using Webkit.Sessions;
 using Webkit.Models.EntityFramework;
 using Webkit.Architectures.Default.DTOs;
+using Microsoft.EntityFrameworkCore;
+using System.Reflection;
+using Webkit.Extensions.Logging;
+using Webkit.Attributes;
+using Webkit.Architectures.Default.Endpoints;
 
 namespace Webkit.Architectures.Default
 {
+    /// <summary>
+    /// An architecture pack used to automatically set up the application for a certain application architecture style
+    /// <para>Registers 3 new endpoints.</para>
+    /// <list type="bullet">
+    ///     <item>api/authentication/login</item>
+    ///     <item>api/authentication/register</item>
+    ///     <item>api/authentication/verify</item>
+    /// </list>
+    /// </summary>
     public class DefaultArchitecturePack
     {
-        public static void Load(WebApplication app, string sqlConnectionString)
-        {
-            app.MapPost("api/authentication/login", Login);
-        }
+        public static DefaultArchitectureConfig Config { get; set; } = new DefaultArchitectureConfig();
 
-        static public ActionResult Login(HttpContext ctx, [FromBody] LoginDto loginDto)
+        /// <summary>
+        /// Loads the pack into the application
+        /// </summary>
+        /// <typeparam name="T">The DbContext of your application - MUST be derived from DefaultArchitectureDatabaseContext</typeparam>
+        /// <param name="config"></param>
+        /// <exception cref="Exception"></exception>
+        public static void Load<T>(DefaultArchitectureConfig config) where T : new()
         {
-            using (DefaultArchitectureDatabaseContext db = new DefaultArchitectureDatabaseContext())
+            Config = config;
+
+            config.WebApp.MapPost("api/authentication/login", Authentication.Login<T>);
+            config.WebApp.MapPost("api/authentication/register", Authentication.Register<T>);
+            
+            if(config.UseAccountVerification)
             {
-                List<UserModel> users = db.Users.Where(user => user.Username == loginDto.Username && PasswordHandler.Verify(loginDto.Password, user.Password)).ToList();
-                if (!users.Any())
+                config.WebApp.MapPost("api/authentication/verify", Authentication.Verify<T>);
+            }
+
+            if(config.UseTelemetry)
+            {
+                config.WebApp.MapGet("api/telemetry", TelemetryEndpoint.Telemetry);
+            }
+
+            AuthenticateAttribute.Validate = (string token) =>
+            {
+                using (DefaultArchitectureDatabaseContext? db = new T() as DefaultArchitectureDatabaseContext)
                 {
-                    return new NotFoundResult();
+                    if (db is null)
+                    {
+                        throw new Exception($"Db {typeof(T)} cannot be null!");
+                    }
+
+                    if(db.Users.Any(user => user.SessionToken == token && user.SessionDuration > DateTime.Now))
+                    {
+                        return true;
+                    }
                 }
 
-                UserModel user = users.First();
-                JsonSecurityToken jsonToken = new JsonSecurityToken(user.Id, user.Roles);
-
-                DateTime tokenExpiration = DateTime.Now.AddDays(30);
-                string token = UserSessionCache.Register(jsonToken, tokenExpiration);
-                user.Token = token;
-
-                db.SaveChanges();
-
-                ctx.Response.Cookies.Append("token", token, new CookieOptions
-                {
-                    Expires = tokenExpiration,
-                });
-                return new OkResult();
-            }
+                return false;
+            };
         }
     }
 }

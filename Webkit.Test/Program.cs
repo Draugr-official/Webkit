@@ -25,8 +25,6 @@ namespace Webkit.Test
     {
         public static void Main(string[] args)
         {
-            Console.OutputEncoding = Encoding.Unicode;
-
             WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
             // Add services to the container.
@@ -49,25 +47,49 @@ namespace Webkit.Test
 
             app.UseAuthorization();
 
-            DefaultArchitecturePack.Load(app, "");
+            DefaultArchitecturePack.Load<MockDatabase>(new DefaultArchitectureConfig
+            {
+                ApplicationName = "Webkit.Test",
+                WebApp = app,
+
+                UseAccountVerification = true,
+                UseTelemetry = true,
+
+                SendGridApiKey = Environment.GetEnvironmentVariable("SENDGRID_API_KEY") ?? "",
+                SenderEmailAddress = "notifications@reckon.no",
+                SenderEmailName = "Reckon"
+            });
 
             using (MockDatabase db = new MockDatabase())
             {
                 string firstName = TestData.FirstName();
                 string lastName = TestData.LastName();
 
-                db.Users.Add(new UserModel
+                db.Users.Add(new User
                 {
                     FirstName = firstName,
                     LastName = lastName,
                     Username = "andbjorn",
-                    Email = TestData.Email(firstName, lastName),
-                    Password = PasswordHandler.Hash("123"),
+                    Email = "andbjornwil@gmail.com",
+                    Password = PasswordManager.Hash("123"),
                     Roles = new List<string>
                     {
                         "Users",
                         "Administrator",
-                    }
+                    },
+                });
+
+                db.Users.Add(new User
+                {
+                    FirstName = firstName,
+                    LastName = lastName,
+                    Username = "test",
+                    Email = "andbjornwil@gmail.com",
+                    Password = PasswordManager.Hash("123"),
+                    Roles = new List<string>
+                    {
+                        "Users",
+                    },
                 });
 
                 db.SaveChanges();

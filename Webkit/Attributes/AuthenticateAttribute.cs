@@ -30,16 +30,17 @@ namespace Webkit.Attributes
         {
             if (context.HttpContext.Request.Cookies.TryGetValue("token", out string token))
             {
-                string rawJsonSecurityToken = Encoding.UTF8.GetString(Convert.FromBase64String(token));
-                JsonSecurityToken? jsonSecurityToken = JsonSecurityToken.FromString(rawJsonSecurityToken);
+                token.Log("Token: ");
+
+                JsonSecurityToken? jsonSecurityToken = JsonSecurityToken.FromString(Encoding.UTF8.GetString(Convert.FromBase64String(token)));
                 if (jsonSecurityToken == null)
                 {
-                    context.Result = new BadRequestResult();
+                    context.Result = new UnauthorizedResult();
                     return;
                 }
 
                 // If token is valid
-                if (!UserSessionCache.IsValid(token))
+                if (!Validate(token))
                 {
                     context.Result = new UnauthorizedResult();
                     return;
@@ -48,7 +49,7 @@ namespace Webkit.Attributes
                 return;
             }
 
-            context.Result = new BadRequestResult();
+            context.Result = new UnauthorizedResult();
             return;
         }
     }

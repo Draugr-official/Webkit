@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,7 +10,7 @@ namespace Webkit.Architectures.Default
 {
     public class DefaultArchitectureDatabaseContext : DbContext
     {
-        public DbSet<UserModel> Users { get; set; }
+        public virtual DbSet<UserModel> Users { get; set; }
     }
 
     public static class DefaultArchitectureDatabaseContextExtensions

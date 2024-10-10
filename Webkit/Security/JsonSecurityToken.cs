@@ -5,6 +5,7 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using System.Text.Json.Serialization.Metadata;
 using System.Threading.Tasks;
 
 namespace Webkit.Security
@@ -15,6 +16,8 @@ namespace Webkit.Security
     [Serializable]
     public class JsonSecurityToken
     {
+        public JsonSecurityToken() {  }
+
         /// <summary>
         /// The guid of the user
         /// </summary>
@@ -68,7 +71,10 @@ namespace Webkit.Security
         /// <returns></returns>
         public static JsonSecurityToken? FromString(string rawJsonSecurityToken)
         {
-            return JsonSerializer.Deserialize<JsonSecurityToken>(rawJsonSecurityToken);
+            return JsonSerializer.Deserialize<JsonSecurityToken>(rawJsonSecurityToken, new JsonSerializerOptions
+            {
+                IncludeFields = true
+            });
         }
         
         public override string ToString()
