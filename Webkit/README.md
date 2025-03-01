@@ -39,6 +39,20 @@ Webkit is a SDK for ASP.NET applications. This SDK provides a wide range of usef
 	* Password.PasswordHandler
 		* string Hash(string password)
 		* bool Validate(string password, string hash)
+1. [Data](#webkit.data)
+    * TestData
+    	* string FirstName()
+		* string LastName()
+		* string WorkType()
+		* string DomainExtension()
+		* string Domain()
+		* string Domain(string firstName)
+		* string Domain(string firstName, string workType)
+		* string Domain(string name, string workType, string extension)
+		* string Email()
+		* string Email(string firstName)
+		* string Email(string firstName, string lastName)
+		* string Email(string firstName, string lastName, string domain)
 
 # Webkit.Extensions
 Webkit contains a couple extension methods to make data conversion and management a lot easier.
@@ -210,7 +224,7 @@ user.AsXml();
 
 ___
 
-## Webkit.Security
+# Webkit.Security
 Webkit contains a couple methods to manage data that needs to be cryptographically secure.
 
 ### `<string> CryptographicGenerator.Seed(int length)`
@@ -282,3 +296,104 @@ ___
 ## Telemetry
 
 Webkit has a telemetry attribute to make handling diagnostics as easy as possible.
+
+___
+
+# Webkit.Data
+Webkit has features to make mocking and creating test data a lot easier by creating for you during runtime.
+
+### `<string> TestData.FirstName()`
+Returns a random first name. Names are not specifically geographically sourced and can root from anywhere in the world.
+```cs
+TestData.FirstName().Log();
+
+// Dorian
+```
+
+### `<string> TestData.LastName()`
+Returns a random last name. Names are not specifically geographically sourced and can root from anywhere in the world.
+```cs
+TestData.LastName().Log();
+
+// Briggs
+```
+
+### `<string> TestData.WorkType()`
+Returns a random work type.
+```cs
+TestData.WorkType().Log();
+
+// Construction
+```
+
+### `<string> TestData.DomainExtension()`
+Returns a random domain extension without the dot.
+```cs
+TestData.DomainExtension().Log();
+
+// com
+```
+
+### `<string> TestData.Domain()`
+Returns a random domain.
+```cs
+TestData.Domain().Log();
+
+// jamesprojectmanagement.com
+```
+
+### `<string> TestData.Domain(string firstName)`
+Returns a random domain with a specified name.
+```cs
+TestData.Domain("Joe").Log();
+
+// joeplumbing.org
+```
+
+### `<string> TestData.Domain(string firstName, string workType)`
+Returns a random domain with a specified name and work type.
+```cs
+TestData.Domain("Peter", "Fitness").Log();
+
+// peterfitness.nz
+```
+
+### `<string> TestData.Domain(string firstName, string workType, string extension)`
+Returns a domain with a specified name, work type and extension.
+```cs
+TestData.Domain("George", "Racing", "uk").Log();
+
+// georgeracing.uk
+```
+
+### `<string> TestData.Email()`
+Returns a random email.
+```cs
+TestData.Email().Log();
+
+// chris.hammington@carlsondevops.en
+```
+
+### `<string> TestData.Email(string firstName)`
+Returns a random email with a specified first name.
+```cs
+TestData.Email("Walter").Log();
+
+// walter.witley@justinrobotics.pl
+```
+
+### `<string> TestData.Email(string firstName, lastName)`
+Returns a random email with a specified first name and last name.
+```cs
+TestData.Email("Arnold", "Matthews").Log();
+
+// arnold.matthews@liamhvac.it
+```
+
+### `<string> TestData.Email(string firstName, lastName, string domain)`
+Returns an email with a specified first name, last name and domain
+```cs
+TestData.Email("Mason", "Cortes", "masondevelopment.com").Log();
+
+// mason.cortes@masondevelopment.com
+```

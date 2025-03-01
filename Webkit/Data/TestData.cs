@@ -57,7 +57,7 @@ namespace Webkit.Data
         /// </summary>
         public static string Domain()
         {
-            return Domain(FirstName(), Regex.Replace(WorkType(), @"\s+", ""), DomainExtension());
+            return Domain(FirstName(), WorkType(), DomainExtension());
         }
 
         /// <summary>
