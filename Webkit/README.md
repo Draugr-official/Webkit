@@ -59,10 +59,10 @@ Webkit contains a couple extension methods to make data conversion and managemen
 
 ## Webkit.Extensions.Logging
 
-### `Action<object> DefaultLog(object data)`
+### `Action<object> LoggingAction(object data)`
 The method used when Log methods are called. This is defaulted to `Console.WriteLine`
 ```cs
-LoggingExtensions.DefaultLog = (object data) =>
+LoggingExtensions.LoggingAction = (object data) =>
 {
 	Console.WriteLine(data);
 }

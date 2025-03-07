@@ -20,7 +20,7 @@ namespace Webkit.Extensions.Logging
         /// <summary>
         /// The logging method used in for Log extensions. Console.WriteLine is used by default.
         /// </summary>
-        public static Action<object> DefaultLog { get; set; } = System.Console.WriteLine;
+        public static Action<object> LoggingAction { get; set; } = System.Console.WriteLine;
 
 
 
@@ -85,11 +85,11 @@ namespace Webkit.Extensions.Logging
         {
             if (value == null)
             {
-                DefaultLog("null");
+                LoggingAction("null");
                 return value;
             }
 
-            DefaultLog(value);
+            LoggingAction(value);
             return value;
         }
 
